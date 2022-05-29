@@ -16,6 +16,7 @@
       userName = "emmabastas";
       userEmail = "emma.bastas@protonmail.com";
       extraConfig.init.defaultBranch = "main";
+      ignores = [ "*.swp" ];
     };
   };
   home.file.".config/i3/config".text = builtins.readFile ./i3.conf;
