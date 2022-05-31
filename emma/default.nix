@@ -1,9 +1,13 @@
 { pkgs, ... }:
 
+let
+  vim = (pkgs.callPackage ./vim.nix {});
+in
 {
   home.packages = with pkgs; [
     (callPackage ./st {})
-    (callPackage ./vim.nix {})
+    vim
+    (callPackage ./doom-emacs {})
     (nerdfonts.override { fonts = [ "FiraCode" ]; })
     pkgs.firefox
     (callPackage /home/emma/nixpkgs/pkgs/tools/security/spectre-cli {})
@@ -15,7 +19,10 @@
       enable = true;
       userName = "emmabastas";
       userEmail = "emma.bastas@protonmail.com";
-      extraConfig.init.defaultBranch = "main";
+      extraConfig = {
+        core.editor = "${vim.out}/bin/vim";
+        init.defaultBranch = "main";
+      };
       ignores = [ "*.swp" ];
     };
   };
