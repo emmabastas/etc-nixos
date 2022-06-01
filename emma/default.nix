@@ -10,6 +10,7 @@ in
     (callPackage ./doom-emacs {})
     (nerdfonts.override { fonts = [ "FiraCode" ]; })
     pkgs.firefox
+    chromium
     (callPackage /home/emma/nixpkgs/pkgs/tools/security/spectre-cli {})
   ];
   programs = {
