@@ -1,17 +1,19 @@
 { pkgs, ... }:
 
 let
-  vim = (pkgs.callPackage ./vim.nix {});
+  callPackage = pkgs.callPackage;
+
+  vim = (callPackage ./vim.nix {});
 in
 {
-  home.packages = with pkgs; [
+  home.packages = [
     (callPackage ./st {})
-    vim
     (callPackage ./doom-emacs {})
-    (nerdfonts.override { fonts = [ "FiraCode" ]; })
-    pkgs.firefox
-    chromium
     (callPackage /home/emma/nixpkgs/pkgs/tools/security/spectre-cli {})
+    vim
+    pkgs.firefox
+    pkgs.chromium
+    (pkgs.nerdfonts.override { fonts = [ "FiraCode" ]; })
   ];
   programs = {
     ssh.enable = true;
