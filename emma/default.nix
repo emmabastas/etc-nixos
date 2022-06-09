@@ -4,6 +4,8 @@ let
   callPackage = pkgs.callPackage;
 
   vim = (callPackage ./vim.nix {});
+
+  direnv = pkgs.direnv;
 in
 {
   home.packages = [
@@ -11,6 +13,7 @@ in
     (callPackage ./doom-emacs {})
     (callPackage /home/emma/nixpkgs/pkgs/tools/security/spectre-cli {})
     vim
+    direnv
     pkgs.firefox
     pkgs.chromium
     pkgs.megacmd
@@ -18,7 +21,12 @@ in
   ];
   programs = {
     ssh.enable = true;
-    bash.enable = true;
+    bash = {
+      enable = true;
+      bashrcExtra = ''
+        eval "$(${direnv}/bin/direnv hook bash)"
+      '';
+    };
     git = {
       enable = true;
       userName = "emmabastas";
