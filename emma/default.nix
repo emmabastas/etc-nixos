@@ -13,6 +13,7 @@ in
     vim
     pkgs.firefox
     pkgs.chromium
+    pkgs.megacmd
     (pkgs.nerdfonts.override { fonts = [ "FiraCode" ]; })
   ];
   programs = {
