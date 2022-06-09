@@ -30,6 +30,6 @@ in
       ignores = [ "*.swp" ];
     };
   };
-  home.file.".config/i3/config".text = builtins.readFile ./i3.conf;
+  home.file.".config/i3/config".source = ./i3.conf;
   fonts.fontconfig.enable = true;
 }
