@@ -1,5 +1,8 @@
 { config, pkgs, ... }:
 
+let
+  doom-emacs = (pkgs.callPackage ./emma/doom-emacs {});
+in
 {
   imports =
     [ # Include the results of the hardware scan.
@@ -128,7 +131,10 @@
     extraGroups = [ "wheel" "networkmanager" ];
   };
   home-manager.useUserPackages = true;
-  home-manager.users.emma = (import ./emma);
+  home-manager.users.emma = (import ./emma {
+    pkgs = pkgs;
+    emacs = doom-emacs;
+  });
 
   #fonts.fontDir.enable = true;
   #fonts.fonts = with pkgs; [
@@ -145,7 +151,7 @@
 
   services.emacs = {
     enable = true;
-    package = (pkgs.callPackage ./emma/doom-emacs {});
+    package = doom-emacs;
   };
 
   # This value determines the NixOS release from which the default
