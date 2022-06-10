@@ -10,7 +10,6 @@ in
 {
   home.packages = [
     (callPackage ./st {})
-    (callPackage ./doom-emacs {})
     (callPackage /home/emma/nixpkgs/pkgs/tools/security/spectre-cli {})
     vim
     direnv
