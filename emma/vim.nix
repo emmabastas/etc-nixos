@@ -3,7 +3,6 @@
 
 vim_configurable.customize {
   name = "vim";
-  wrapGui = true; # This gives us gvim which also adds clipboard support to vim
   vimrcConfig.customRC = ''
     " Relative line numbering
     set number
