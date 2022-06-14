@@ -3,6 +3,8 @@
 let
   callPackage = pkgs.callPackage;
 
+  spectre-cli = (callPackage /home/emma/nixpkgs/pkgs/tools/security/spectre-cli {});
+
   vim = (callPackage ./vim.nix {});
 
   direnv = pkgs.direnv;
@@ -21,7 +23,7 @@ in
 {
   home.packages = [
     (callPackage ./st {})
-    (callPackage /home/emma/nixpkgs/pkgs/tools/security/spectre-cli {})
+    spectre-cli
     vim
     direnv
     firefox
@@ -48,6 +50,10 @@ in
       };
       ignores = [ "*.swp" ];
     };
+  };
+  home.shellAliases = {
+    spectre = ''SPECTRE_USERNAME="emmabastas" ${spectre-cli}/bin/spectre -q'';
+    spectre_ = ''${spectre-cli}/bin/spectre -q'';
   };
   home.file = {
     ".config/i3/config".source = ./i3.conf;
