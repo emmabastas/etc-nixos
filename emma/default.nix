@@ -51,6 +51,7 @@ in
   };
   home.file = {
     ".config/i3/config".source = ./i3.conf;
+    ".config/nix/nix.conf".text = ''experimental-features = nix-command flakes'';
     "bin/emacs" = applicationScript "${emacs}/bin/emacsclient -cn $@";
     "bin/firefox" = applicationScript "${firefox}/bin/firefox $@";
   };
