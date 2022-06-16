@@ -9,6 +9,6 @@ callPackage (builtins.fetchTarball {
   extraPackages = [ multimarkdown ];
 
   extraConfig = ''
-    (setq markdown-command "${multimarkdown}/bin/multimarkdown")
+    (setq exec-path (append exec-path '("${multimarkdown}/bin")))
   '';
 }
