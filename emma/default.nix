@@ -11,6 +11,8 @@ let
 
   firefox = pkgs.firefox;
 
+  chromium = pkgs.chromium;
+
   applicationScript = cmd: {
     text = ''
       #!/bin/sh
@@ -27,7 +29,7 @@ in
     vim
     direnv
     firefox
-    pkgs.chromium
+    chromium
     pkgs.megacmd
     (pkgs.nerdfonts.override { fonts = [ "FiraCode" ]; })
   ];
@@ -60,6 +62,7 @@ in
     ".config/nix/nix.conf".text = ''experimental-features = nix-command flakes'';
     "bin/emacs" = applicationScript "${emacs}/bin/emacsclient -cn $@";
     "bin/firefox" = applicationScript "${firefox}/bin/firefox $@";
+    "bin/chromium" = applicationScript "${chromium}/bin/chromium $@";
   };
   fonts.fontconfig.enable = true;
 }
