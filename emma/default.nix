@@ -13,14 +13,18 @@ let
 
   chromium = pkgs.chromium;
 
-  applicationScript = cmd: {
+  shellScript = cmd: {
     text = ''
       #!/bin/sh
-      (${cmd} &)
-      kill $(expr $PPID - 1)
+      ${cmd}
     '';
     executable = true;
   };
+
+  applicationScript = cmd: shellScript ''
+    (${cmd} &)
+    kill $(expr $PPID - 1)
+  '';
 in
 {
   home.packages = [
@@ -61,6 +65,7 @@ in
     ".config/i3/config".source = ./i3.conf;
     ".config/nix/nix.conf".text = ''experimental-features = nix-command flakes'';
     "bin/emacs" = applicationScript "${emacs}/bin/emacsclient -cn $@";
+    "bin/emacs-develop" = shellScript "${emacs}/bin/emacs-28.1 -l /etc/nixos/emma/doom-emacs/config.el $@";
     "bin/firefox" = applicationScript "${firefox}/bin/firefox $@";
     "bin/chromium" = applicationScript "${chromium}/bin/chromium $@";
   };
