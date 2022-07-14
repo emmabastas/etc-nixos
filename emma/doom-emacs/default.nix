@@ -15,11 +15,11 @@ callPackage (builtins.fetchTarball {
 
   extraPackages = [
     multimarkdown   # Previews in markdown mode
-    hunspell        # Used by the `spell` module
+    #hunspell        # Used by the `spell` module
   ];
 
   extraConfig = ''
     (setq exec-path (append exec-path '("${multimarkdown}/bin")))
-    (setq exec-path (append exec-path '("${hunspell}/bin")))
+    ;(setq exec-path (append exec-path '("${hunspell}/bin")))
   '';
 }
