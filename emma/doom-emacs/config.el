@@ -11,13 +11,19 @@
   ;; TODO keywords
 
   (setq org-todo-keywords
-        '((sequence "TODO(t)" "WATCH(w)" "|" "DONE(d)")
+        '((sequence "TODO(t)" "NEXT(n)" "PROJ(p)" "WATCH(w)" "HOLD(h)" "BACKLOG(b)" "|" "DONE(d)" "KILL(k)")
           (sequence "MEET(m)" "|" "MEET_(_)")))
 
   (setq org-todo-keyword-faces
         '(("TODO" . "medium sea green")
+          ("PROJ" . "dark cyan")
           ("WATCH" . "khaki")
+          ("HOLD" . "coral")
+          ("BACKLOG" . "yellow green")
           ("MEET" . "light sea green")))
+
+  (setq org-stuck-projects
+        '("TODO={.+}/-DONE" nil nil "SCHEDULED:\\|DEADLINE:"))
 
   ;; move by visual lines
   (define-key evil-normal-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
