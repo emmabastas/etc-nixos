@@ -35,6 +35,7 @@ in
     firefox
     chromium
     pkgs.megacmd
+    pkgs.signal-desktop
     (pkgs.nerdfonts.override { fonts = [ "FiraCode" ]; })
   ];
   programs = {
