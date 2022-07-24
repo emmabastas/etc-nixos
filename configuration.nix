@@ -110,6 +110,14 @@ in
   services.xserver.libinput.enable = true;
 
 
+  ##############
+  # Teamviewer #
+  ##############
+
+  nixpkgs.config.allowUnfree = true;
+  services.teamviewer.enable = true;
+
+
   ###################
   # System packages #
   ###################

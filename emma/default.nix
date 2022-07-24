@@ -36,6 +36,8 @@ in
     chromium
     pkgs.megacmd
     pkgs.signal-desktop
+    pkgs.feh
+    pkgs.gimp
     (pkgs.nerdfonts.override { fonts = [ "FiraCode" ]; })
   ];
   programs = {
