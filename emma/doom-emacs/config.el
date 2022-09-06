@@ -66,6 +66,14 @@
                           '(("^ *\\([-]\\) "
                              (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•")))))))
 
+  ;; What programs to use when opening `'file:///`-style hyperlinks
+  (setq org-file-apps
+        '((auto-mode . emacs)
+          ("\\.mm\\'" . default)
+          ("\\.x?html?\\'" . default)
+          ("\\.pdf\\'" . "firefox %s")))
+
+
 
 ;;; Misc
 
