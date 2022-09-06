@@ -8,7 +8,7 @@
 
 (after! org
 
-  ;; TODO keywords
+  ;; TODO keywords and their colors
 
   (setq org-todo-keywords
         '((sequence "TODO(t)" "NEXT(n)" "PROJ(p)" "WATCH(w)" "HOLD(h)" "BACKLOG(b)" "|" "DONE(d)" "KILL(k)")
@@ -31,6 +31,8 @@
   (define-key evil-motion-state-map (kbd "<remap> <evil-forward-char>") 'right-char)
   (define-key evil-normal-state-map (kbd "<remap> <evil-backward-char>") 'left-char)
   (define-key evil-motion-state-map (kbd "<remap> <evil-forward-char>") 'right-char)
+
+  ;; customize what text looks like
 
   (custom-theme-set-faces 'user
                           '(org-level-1 ((t (:foreground "gray" :height 1.3 :weight bold))))
