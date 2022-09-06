@@ -22,9 +22,6 @@
           ("BACKLOG" . "yellow green")
           ("MEET" . "light sea green")))
 
-  (setq org-stuck-projects
-        '("TODO={.+}/-DONE" nil nil "SCHEDULED:\\|DEADLINE:"))
-
   ;; move by visual lines
   (define-key evil-normal-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
   (define-key evil-motion-state-map (kbd "<remap> <evil-previous-line>") 'evil-previous-visual-line)
