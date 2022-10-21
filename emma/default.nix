@@ -71,7 +71,6 @@ in
     "bin/emacs-develop" = shellScript "${emacs}/bin/emacs-28.1 -l /etc/nixos/emma/doom-emacs/config.el $@";
     "bin/firefox" = applicationScript "${firefox}/bin/firefox $@";
     "bin/chromium" = applicationScript "${chromium}/bin/chromium $@";
-    "bin/accs" = shellScript "grep Url ~/org/accounts.org && grep $1 ~/org/accounts.org";
   };
   fonts.fontconfig.enable = true;
 }
