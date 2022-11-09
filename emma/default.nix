@@ -1,4 +1,4 @@
-{ pkgs, emacs }:
+{ pkgs, emacs, ... }:
 
 let
   callPackage = pkgs.callPackage;

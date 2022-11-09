@@ -6,7 +6,6 @@ in
 {
   imports =
     [ # Include the results of the hardware scan.
-      <home-manager/nixos>
       ./hardware-configuration.nix
     ];
 
@@ -138,11 +137,6 @@ in
     isNormalUser = true;
     extraGroups = [ "wheel" "networkmanager" ];
   };
-  home-manager.useUserPackages = true;
-  home-manager.users.emma = (import ./emma {
-    pkgs = pkgs;
-    emacs = doom-emacs;
-  });
 
   #fonts.fontDir.enable = true;
   #fonts.fonts = with pkgs; [

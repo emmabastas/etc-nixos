@@ -9,7 +9,8 @@ let
 in
 
 callPackage (builtins.fetchTarball {
-  url = https://github.com/nix-community/nix-doom-emacs/archive/master.tar.gz;
+  url = https://github.com/nix-community/nix-doom-emacs/archive/c38ccd08345f58001cac2c2578e71d3f29b59bc0.tar.gz;
+  sha256 = "1k4wxn84hgxmr2ddbmybnqqih07r22d3qfyx5rjl9fzw2p5kkxhk";
 }) {
   doomPrivateDir = ./.;
 
