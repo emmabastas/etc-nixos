@@ -3,7 +3,7 @@
 let
   callPackage = pkgs.callPackage;
 
-  spectre-cli = (callPackage /home/emma/nixpkgs/pkgs/tools/security/spectre-cli {});
+  spectre-cli = (callPackage ./spectre-cli.nix {});
 
   vim = (callPackage ./vim.nix {});
 
