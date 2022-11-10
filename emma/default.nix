@@ -33,7 +33,6 @@ in
     vim
     direnv
     firefox
-    chromium
     pkgs.megacmd
     pkgs.signal-desktop
     pkgs.feh
