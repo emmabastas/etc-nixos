@@ -61,6 +61,12 @@ in
     doom-emacs = {
       enable = true;
       doomPrivateDir = ./doom-emacs;
+      extraPackages = with pkgs; [
+        graphviz # Used by org-roam to render notes as a graph
+      ];
+      extraConfig = with pkgs; ''
+        (setq org-roam-graph-executable "${graphviz.out}/bin/dot")
+      '';
     };
   };
   services.emacs = {
