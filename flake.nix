@@ -28,13 +28,15 @@
         inherit system;
 
         modules = [
-          ./configuration.nix
           home-manager.nixosModules.home-manager {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.users.emma = import ./emma;
-            home-manager.extraSpecialArgs = { emacs = nix-doom-emacs; };
+            home-manager.users.emma = lib.mkMerge [
+              nix-doom-emacs.hmModule
+              (import ./emma)
+            ];
           }
+          ./configuration.nix
         ];
       };
     };

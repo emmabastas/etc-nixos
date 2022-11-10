@@ -1,8 +1,5 @@
 { config, pkgs, ... }:
 
-let
-  doom-emacs = (pkgs.callPackage ./emma/doom-emacs {});
-in
 {
   imports =
     [ # Include the results of the hardware scan.
@@ -150,11 +147,6 @@ in
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
-
-  services.emacs = {
-    enable = true;
-    package = doom-emacs;
-  };
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

@@ -1,4 +1,4 @@
-{ pkgs, emacs, ... }:
+{ pkgs, ... }:
 
 let
   callPackage = pkgs.callPackage;
@@ -59,6 +59,13 @@ in
       };
       ignores = [ "*.swp" ];
     };
+    doom-emacs = {
+      enable = true;
+      doomPrivateDir = ./doom-emacs;
+    };
+  };
+  services.emacs = {
+    enable = true;
   };
   home.shellAliases = {
     spectre = ''SPECTRE_USERNAME="emmabastas" ${spectre-cli}/bin/spectre -q'';
@@ -67,8 +74,8 @@ in
   home.file = {
     ".config/i3/config".source = ./i3.conf;
     ".config/nix/nix.conf".text = ''experimental-features = nix-command flakes'';
-    "bin/emacs" = applicationScript "${emacs}/bin/emacsclient -cn $@";
-    "bin/emacs-develop" = shellScript "${emacs}/bin/emacs-28.1 -l /etc/nixos/emma/doom-emacs/config.el $@";
+    "bin/emacs" = applicationScript "emacsclient -cn $@";
+    "bin/emacs-debug" = shellScript "emacs-28.1 -l /etc/nixos/emma/doom-emacs/config.el $@";
     "bin/firefox" = applicationScript "${firefox}/bin/firefox $@";
     "bin/chromium" = applicationScript "${chromium}/bin/chromium $@";
   };
