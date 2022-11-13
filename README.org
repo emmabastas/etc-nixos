@@ -1,0 +1,416 @@
+* Table of contents :TOC_3:
+- [[#how-to-use][How to use]]
+  - [[#tangle][Tangle]]
+  - [[#make-sure-relevant-files-are-checking-into-version-control][Make sure relevant files are checking into version control]]
+  - [[#apply-the-config-with-dry-activate--test--switch][Apply the config with ~dry-activate~ / ~test~ / ~switch~]]
+- [[#root-config][Root config]]
+- [[#desktop-environment][Desktop environment]]
+- [[#networking][Networking]]
+- [[#localizationkeymaptimezone][Localization/keymap/timezone]]
+- [[#other-packages][Other packages]]
+  - [[#vim][Vim]]
+  - [[#teamviewer][Teamviewer]]
+- [[#user-emma][User emma]]
+- [[#machine-specific-configuration][Machine specific configuration]]
+    - [[#high-res-screen][High-res screen]]
+    - [[#screen-brightness][Screen brightness]]
+    - [[#sound][Sound]]
+    - [[#touchpad][Touchpad]]
+    - [[#boot][Boot]]
+    - [[#result-of-nixos-generate-config][Result of ~nixos-generate-config~]]
+- [[#misc][Misc]]
+  - [[#use-x-server][Use X server:]]
+  - [[#ssh][SSH]]
+  - [[#allow-unfree-packages][Allow unfree packages]]
+  - [[#state-version][State version]]
+- [[#global-todos][Global TODOS]]
+  - [[#should-i3-be-configured-in-nix-instead-of-in-a-separate-config-file][Should =i3= be configured in nix instead of in a separate config file?]]
+
+* How to use
+
+** Tangle
+#+begin_src elisp :noweb yes
+(org-babel-tangle)
+#+end_src
+
+#+RESULTS:
+| flake.nix |
+
+** Make sure relevant files are checking into version control
+
+When running a nix flake unstaged files are ignored (see[[https://github.com/NixOS/nix/pull/6858][ this issue]]) which can result in some confusing error messages about files not existing. Make sure all the relevant files are (temporarily) staged.
+
+** Apply the config with ~dry-activate~ / ~test~ / ~switch~
+
+~nixos-rebuild <dry-activate | test | switch> --flake .~
+
+* Root config
+
+This config is =flake.nix= compatible which is the root of the config.
+Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my original config to =flake.nix=
+
+#+begin_src nix :noweb yes :tangle flake.nix
+{
+  description = "emmabastas system configuration";
+
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-22.05";
+    home-manager = {
+      url = "github:nix-community/home-manager/release-22.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nix-doom-emacs.url = "github:nix-community/nix-doom-emacs";
+  };
+
+  outputs = { nixpkgs, home-manager, nix-doom-emacs, ... }:
+  let
+    system = "x86_64-linux";
+
+    pkgs = import nixpkgs {
+      inherit system;
+      config = { allowUnfree = true; };
+    };
+
+    lib = nixpkgs.lib;
+
+    # merges a list of attrsets into a single attrset
+    # Credit: https://github.com/rasendubi/dotfiles#flake
+    mergeSections = lib.foldr lib.mergeAttrs {};
+
+    hardware-config = (
+      <<nixos-generate-config()>>
+    );
+  in {
+    nixosConfigurations = {
+      nixos = lib.nixosSystem {
+        inherit system;
+
+        modules = [
+          home-manager.nixosModules.home-manager {
+            home-manager = {
+              useGlobalPkgs = true;
+              useUserPackages = true;
+              <<home-manager-emma>>
+            };
+          }
+          ({ config, pkgs, ... }: {
+            imports = [ hardware-config ];
+
+            environment.systemPackages = [
+              <<system-packages-vim>>
+              <<system-packages-brightnessctl>>
+            ];
+
+            <<system-wide-user-emma>>
+            <<system-wide-boot>>
+            <<system-wide-networking>>
+            <<system-wide-localization>>
+            <<system-wide-machine-specific>>
+            <<system-wide-high-res-1>>
+            <<system-wide-high-res-2>>
+            <<system-wide-desktop-environment>>
+            <<system-wide-sound>>
+            <<system-wide-touchpad>>
+            <<system-wide-misc-x-server>>
+            <<system-wide-misc-ssh>>
+            <<system-wide-misc-allow-unfree>>
+            <<system-wide-misc-state-version>>
+          })
+        ];
+      };
+    };
+  };
+}
+#+end_src
+
+* Desktop environment
+
+Use =i3= as the window manager:
+
+#+name: system-wide-desktop-environment
+#+begin_src nix
+services.xserver = {
+  desktopManager.xterm.enable = false;
+
+  displayManager = {
+    defaultSession = "none+i3";
+  };
+
+  windowManager.i3 = {
+    enable = true;
+  };
+};
+#+end_src
+
+* Networking
+
+We're using =wpa_supplican + NetworkManager=.
+
+#+name: system-wide-networking
+#+begin_src nix
+networking.networkmanager.enable = true;
+
+# The global useDHCP flag is deprecated, therefore explicitly set to false here.
+# Per-interface useDHCP will be mandatory in the future, so this generated config
+# replicates the default behaviour.
+networking.useDHCP = false;
+networking.interfaces.enp3s0.useDHCP = true;
+networking.interfaces.wlp2s0.useDHCP = true;
+
+# Open ports in the firewall.
+# networking.firewall.allowedTCPPorts = [ ... ];
+# networking.firewall.allowedUDPPorts = [ ... ];
+# Or disable the firewall altogether.
+networking.firewall.enable = false;
+#+end_src
+
+* Localization/keymap/timezone
+
+#+name: system-wide-localization
+#+begin_src nix
+i18n.defaultLocale = "en_US.UTF-8";
+console.keyMap = "sv-latin1";
+services.xserver.layout = "se";
+time.timeZone = "Europe/Stockholm";
+#+end_src
+
+* Other packages
+
+** Vim
+
+#+name: system-system-packages-vim
+#+begin_src nix
+pkgs.vim
+#+end_src
+
+** Teamviewer
+
+We sometimes want to use Teamviewer to help friends and family with IT. Teamviewer /feels/ like a major security issue though, so we leave it commented out here and only uncomment for those brief moments where we need it.
+
+Temviewer requires ~nixpkgs.config.allowUnfree = true;~ (see: [[*Allow unfree packages][Allow unfree packages]])
+
+#+begin_src nix
+  #services.teamviewer.enable = true;
+#+end_src
+
+We could proably find a better way to disable teamviewer by default, but this is 80/20.
+
+* User emma
+
+#+name: system-wide-user-emma
+#+begin_src nix
+users.users.emma = {
+  isNormalUser = true;
+  extraGroups = [ "wheel" "networkmanager" ];
+};
+#+end_src
+
+The =networkmanager= group allows us to manage network connections without ~sudo~ (see: [[*Networking][Networking]])
+
+The rest of the configuration lives outside this document in[[file:emma/][ ./emma]]:
+
+#+name: home-manager-emma
+#+begin_src nix
+users.emma = lib.mkMerge [
+  nix-doom-emacs.hmModule
+  (import ./emma)
+];
+#+end_src
+
+* Machine specific configuration
+
+I'm currently running my config on a single machine, so no need to split up this part of the config depending on machine yet.
+
+#+name: system-wide-machine-specific
+#+begin_src nix
+networking.hostName = "nixos";
+#+end_src
+
+*** High-res screen
+
+The TTY font is very small on a high-res screen, we use a large Terminus font to remedy this.
+~earlySetup = true~ applies the bigger font earlier in the startup process.
+
+#+name: system-wide-high-res-1
+#+begin_src nix
+console = {
+  earlySetup = true;
+  font = "${pkgs.terminus_font}/share/consolefonts/ter-132n.psf.gz";
+  packages = with pkgs; [ terminus_font ];
+};
+#+end_src
+
+These settings appear to produce as tear-free setup.
+~dpi = 220~ is the most important setting here, it makes things scale better for a high-res screen.
+
+#+name: system-wide-high-res-2
+#+begin_src nix
+services.xserver = {
+  videoDrivers = [ "modesetting" ];
+  useGlamor = true;
+  dpi = 220;
+};
+#+end_src
+
+If we where to experience graphics isses these settings could help, the perf would drop though.
+
+#+begin_src nix
+services.xserver = {
+  videoDrivers = [ "intel" ];
+  deviceSection = ''
+    Option "DRI" "2"
+    Option "TearFree" "true"
+  '';
+};
+#+end_src
+
+*** Screen brightness
+
+Our machine has brightness function keys that aren't configured by default, so we do it manually.
+
+We use =brightnessctl= to set brightness:
+
+#+name: system-packages-brightnessctl
+#+begin_src nix
+pkgs.brightnessctl
+#+end_src
+
+**** TODO configure i3 in this section instead of in [[*User emma][User emma]]
+#And then bind the brightness keys to it in =i3=:
+#
+##+begin_src conf :tangle i3.conf
+#bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl s +10%
+#bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl s 10%-
+##+end_src
+
+*** Sound
+#+name: system-wide-sound
+#+begin_src nix
+sound.enable = true;
+hardware.pulseaudio.enable = true;
+#+end_src
+
+**** TODO configure i3 in this section instead of in [[*User emma][User emma]]
+#Our machine has volume functions keys that aren't configured by default, so we do it manually.
+#
+##+begin_src conf :tangle i3.conf
+#set $refresh_i3status killall -SIGUSR1 i3status
+#bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_i3status
+#bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -10% && $refresh_i3status
+#bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle && $refresh_i3status
+#bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3status
+##+end_src
+
+*** Touchpad
+#+name: system-wide-touchpad
+#+begin_src nix
+  services.xserver.libinput.enable = true;
+#+end_src
+
+*** Boot
+#+name: system-wide-boot
+#+begin_src nix
+  # Use the systemd-boot EFI boot loader.
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+#+end_src
+
+*** Result of ~nixos-generate-config~
+~nixos-generate-config~ looks at our hardware and gives us some nice config for it
+
+#+name: nixos-generate-config
+#+begin_src shell :results output replace
+nixos-generate-config --show-hardware-config 2>&1
+#+end_src
+
+#+RESULTS:
+#+begin_example
+# Do not modify this file!  It was generated by ‘nixos-generate-config’
+# and may be overwritten by future invocations.  Please make changes
+# to /etc/nixos/configuration.nix instead.
+{ config, lib, pkgs, modulesPath, ... }:
+
+{
+  imports =
+    [ (modulesPath + "/installer/scan/not-detected.nix")
+    ];
+
+  boot.initrd.availableKernelModules = [ "xhci_pci" "ehci_pci" "ahci" "sd_mod" ];
+  boot.initrd.kernelModules = [ ];
+  boot.kernelModules = [ "kvm-intel" ];
+  boot.extraModulePackages = [ ];
+
+  fileSystems."/" =
+    { device = "/dev/disk/by-uuid/a4ef7ef0-7ea6-46e4-8a5f-ec9cf5fe8f24";
+      fsType = "ext4";
+    };
+
+  fileSystems."/boot" =
+    { device = "/dev/disk/by-uuid/BFEA-950B";
+      fsType = "vfat";
+    };
+
+  swapDevices =
+    [ { device = "/dev/disk/by-uuid/04019ade-d0d4-40ff-a6f9-bf567ae3fce9"; }
+    ];
+
+  # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
+  # (the default) this is the recommended approach. When using systemd-networkd it's
+  # still possible to use this option, but it's recommended to use it in conjunction
+  # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
+  networking.useDHCP = lib.mkDefault true;
+  # networking.interfaces.enp3s0.useDHCP = lib.mkDefault true;
+  # networking.interfaces.wlp2s0.useDHCP = lib.mkDefault true;
+
+  hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+  # high-resolution display
+  hardware.video.hidpi.enable = lib.mkDefault true;
+}
+#+end_example
+
+* Misc
+** Use X server:
+
+#+name: system-wide-misc-x-server
+#+begin_src nix
+  services.xserver = {
+    enable = true;
+    autorun = true;
+  };
+#+end_src
+
+
+** SSH
+
+#+name: system-wide-misc-ssh
+#+begin_src nix
+services.openssh.enable = true;
+#+end_src
+
+** Allow unfree packages
+
+#+name: system-wide-misc-allow-unfree
+#+begin_src nix
+nixpkgs.config.allowUnfree = true;
+#+end_src
+
+** State version
+#+name: system-wide-misc-state-version
+#+begin_src nix
+# This value determines the NixOS release from which the default
+# settings for stateful data, like file locations and database versions
+# on your system were taken. It‘s perfectly fine and recommended to leave
+# this value at the release version of the first install of this system.
+# Before changing this value read the documentation for this option
+# (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
+system.stateVersion = "21.11"; # Did you read the comment?
+#+end_src
+
+
+
+* Global TODOS
+
+** TODO Should =i3= be configured in nix instead of in a separate config file?
+Relevant sections:
+    - [[Screen brightness]]
+    - [[Sound]]
