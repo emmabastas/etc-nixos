@@ -47,7 +47,7 @@
                           '(org-level-6 ((t (:foreground "gray" :height 1.075 :weight bold))))
                           '(org-level-7 ((t (:foreground "gray" :height 1.075 :weight bold))))
                           '(org-level-8 ((t (:foreground "gray" :height 1.075 :weight bold))))
-                          '(org-block ((t (:inherit variable-pitch))))
+                          '(org-block ((t (:inherit (shadow fixed-pitch)))))
                           '(org-code ((t (:inherit (shadow fixed-pitch)))))
                           '(org-document-info ((t (:foreground "dark orange"))))
                           '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
