@@ -1,3 +1,5 @@
+#+STARTUP: overview
+
 * Table of contents :TOC_3:
 - [[#how-to-use][How to use]]
   - [[#tangle][Tangle]]
@@ -23,6 +25,7 @@
   - [[#ssh][SSH]]
   - [[#allow-unfree-packages][Allow unfree packages]]
   - [[#state-version][State version]]
+- [[#mathematica][Mathematica]]
 - [[#global-todos][Global TODOS]]
   - [[#should-i3-be-configured-in-nix-instead-of-in-a-separate-config-file][Should =i3= be configured in nix instead of in a separate config file?]]
   - [[#setup-home-folder-syncing-with-mega][Setup home folder syncing with Mega]]
@@ -124,8 +127,6 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
             {
               imports = [ hardware-config ];
             }
-            <<system-wide-vim>>
-            <<system-wide-brightnessctl>>
             <<system-wide-user-emma>>
             <<system-wide-boot>>
             <<system-wide-networking>>
@@ -134,6 +135,9 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
             <<system-wide-high-res-1>>
             <<system-wide-high-res-2>>
             <<system-wide-desktop-environment>>
+            <<system-wide-vim>>
+            <<system-wide-brightnessctl>>
+            <<system-wide-mathematica>>
             <<system-wide-sound>>
             <<system-wide-touchpad>>
             <<system-wide-misc-x-server>>
@@ -467,6 +471,25 @@ nixos-generate-config --show-hardware-config 2>&1
 }
 #+end_src
 
+
+* Mathematica
+Mathematica is proprietary software, and the nix package requires ~Mathematica_13.0.1_BNDL_LINUX.sh~ to already be a part of the store.
+The file can be downoaded by going to [[https://account.wolfram.com/products]] ~> User Portal~ and doing a =Drect File Download=.
+
+Then add the downloaded file to the store with ~nix-store --add-fixed sha256 Mathematica_13.0.1_BNDL_LINUX.sh~.
+
+Check if the file in in the store with ~ls /nix/store/ | grep Mathematica~.
+
+Of course we need to allow unfree software, see: [[*Allow unfree packages][Allow unfree packages]].
+
+After that we can install the nix package:
+
+#+name: system-wide-mathematica
+#+begin_src nix
+{
+  environment.systemPackages = [ pkgs.mathematica ];
+}
+#+end_src
 
 * Global TODOS
 ** TODO Should =i3= be configured in nix instead of in a separate config file?

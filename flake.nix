@@ -35,6 +35,7 @@
         then head values
       else "${head values}${sep}${join sep (tail values)}";
 
+    # based off https://stackoverflow.com/a/54505212
     recursiveMerge = with self.inputs.nixpkgs.lib; attrList:
       let f = attrPath:
         zipAttrsWith (n: values:
@@ -115,12 +116,6 @@
               imports = [ hardware-config ];
             }
             {
-              environment.systemPackages = [ pkgs.vim ];
-            }
-            {
-              environment.systemPackages = [ pkgs.brightnessctl ];
-            }
-            {
               users.users.emma = {
                 isNormalUser = true;
                 extraGroups = [ "wheel" "networkmanager" ];
@@ -182,6 +177,15 @@
                   enable = true;
                 };
               };
+            }
+            {
+              environment.systemPackages = [ pkgs.vim ];
+            }
+            {
+              environment.systemPackages = [ pkgs.brightnessctl ];
+            }
+            {
+              environment.systemPackages = [ pkgs.mathematica ];
             }
             {
               sound.enable = true;
