@@ -407,10 +407,10 @@ system.stateVersion = "21.11"; # Did you read the comment?
 #+end_src
 
 
-
 * Global TODOS
-
 ** TODO Should =i3= be configured in nix instead of in a separate config file?
 Relevant sections:
     - [[Screen brightness]]
     - [[Sound]]
+
+** TODO Setup home folder syncing with Mega
