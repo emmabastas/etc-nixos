@@ -137,6 +137,7 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
             <<system-wide-vim>>
             <<system-wide-brightnessctl>>
             <<system-wide-mathematica>>
+            <<system-wide-teamviewer>>
             <<system-wide-sound>>
             <<system-wide-touchpad>>
             <<system-wide-misc-x-server>>
@@ -223,6 +224,7 @@ We're using =wpa_supplican + NetworkManager=.
 
 We sometimes want to use Teamviewer to help friends and family with IT. Teamviewer /feels/ like a major security issue though, so we leave it commented out here and only uncomment for those brief moments where we need it.
 
+#+name: system-wide-teamviewer
 #+begin_src nix
 {
   #nixpkgs.config.allowUnfree = true;

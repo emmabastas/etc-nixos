@@ -189,6 +189,10 @@
               environment.systemPackages = [ pkgs.mathematica ];
             }
             {
+              #nixpkgs.config.allowUnfree = true;
+              #services.teamviewer.enable = true;
+            }
+            {
               sound.enable = true;
               hardware.pulseaudio.enable = true;
             }
