@@ -23,7 +23,6 @@
 - [[#misc][Misc]]
   - [[#use-x-server][Use X server:]]
   - [[#ssh][SSH]]
-  - [[#allow-unfree-packages][Allow unfree packages]]
   - [[#state-version][State version]]
 - [[#mathematica][Mathematica]]
 - [[#global-todos][Global TODOS]]
@@ -224,10 +223,9 @@ We're using =wpa_supplican + NetworkManager=.
 
 We sometimes want to use Teamviewer to help friends and family with IT. Teamviewer /feels/ like a major security issue though, so we leave it commented out here and only uncomment for those brief moments where we need it.
 
-Temviewer requires ~nixpkgs.config.allowUnfree = true;~ (see: [[*Allow unfree packages][Allow unfree packages]])
-
 #+begin_src nix
 {
+  #nixpkgs.config.allowUnfree = true;
   #services.teamviewer.enable = true;
 }
 #+end_src
@@ -448,15 +446,6 @@ nixos-generate-config --show-hardware-config 2>&1
 }
 #+end_src
 
-** Allow unfree packages
-
-#+name: system-wide-misc-allow-unfree
-#+begin_src nix
-{
-  nixpkgs.config.allowUnfree = true;
-}
-#+end_src
-
 ** State version
 #+name: system-wide-misc-state-version
 #+begin_src nix
@@ -480,13 +469,12 @@ Then add the downloaded file to the store with ~nix-store --add-fixed sha256 Mat
 
 Check if the file in in the store with ~ls /nix/store/ | grep Mathematica~.
 
-Of course we need to allow unfree software, see: [[*Allow unfree packages][Allow unfree packages]].
-
 After that we can install the nix package:
 
 #+name: system-wide-mathematica
 #+begin_src nix
 {
+  nixpkgs.config.allowUnfree = true;
   environment.systemPackages = [ pkgs.mathematica ];
 }
 #+end_src
