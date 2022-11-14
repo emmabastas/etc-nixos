@@ -25,6 +25,7 @@
   - [[#state-version][State version]]
 - [[#global-todos][Global TODOS]]
   - [[#should-i3-be-configured-in-nix-instead-of-in-a-separate-config-file][Should =i3= be configured in nix instead of in a separate config file?]]
+  - [[#setup-home-folder-syncing-with-mega][Setup home folder syncing with Mega]]
 
 * How to use
 
@@ -62,7 +63,7 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
     nix-doom-emacs.url = "github:nix-community/nix-doom-emacs";
   };
 
-  outputs = { nixpkgs, home-manager, nix-doom-emacs, ... }:
+  outputs = { self, nixpkgs, home-manager, nix-doom-emacs, ... }:
   let
     system = "x86_64-linux";
 
@@ -73,9 +74,35 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
 
     lib = nixpkgs.lib;
 
-    # merges a list of attrsets into a single attrset
-    # Credit: https://github.com/rasendubi/dotfiles#flake
-    mergeSections = lib.foldr lib.mergeAttrs {};
+    allSame = with self.inputs.nixpkgs.lib; values:
+      if tail values == []
+        then true
+      else if head values == head (tail values)
+        then allSame (tail values)
+      else false;
+
+    join = with self.inputs.nixpkgs.lib; sep: values:
+      if values == []
+        then ""
+      else if tail values == []
+        then head values
+      else "${head values}${sep}${join sep (tail values)}";
+
+    # based off https://stackoverflow.com/a/54505212
+    recursiveMerge = with self.inputs.nixpkgs.lib; attrList:
+      let f = attrPath:
+        zipAttrsWith (n: values:
+          if tail values == []
+            then head values
+          else if all isList values
+            then unique (concatLists values)
+          else if all isAttrs values
+            then f (attrPath ++ [n]) values
+          else if allSame values
+            then head values
+          else abort "Values in ${join "." attrPath} can't be merged."
+        );
+      in f [] attrList;
 
     hardware-config = (
       <<nixos-generate-config()>>
@@ -93,14 +120,12 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
               <<home-manager-emma>>
             };
           }
-          ({ config, pkgs, ... }: {
-            imports = [ hardware-config ];
-
-            environment.systemPackages = [
-              <<system-packages-vim>>
-              <<system-packages-brightnessctl>>
-            ];
-
+          ({ config, pkgs, ... }: (recursiveMerge [
+            {
+              imports = [ hardware-config ];
+            }
+            <<system-wide-vim>>
+            <<system-wide-brightnessctl>>
             <<system-wide-user-emma>>
             <<system-wide-boot>>
             <<system-wide-networking>>
@@ -115,7 +140,7 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
             <<system-wide-misc-ssh>>
             <<system-wide-misc-allow-unfree>>
             <<system-wide-misc-state-version>>
-          })
+          ]))
         ];
       };
     };
@@ -129,17 +154,19 @@ Use =i3= as the window manager:
 
 #+name: system-wide-desktop-environment
 #+begin_src nix
-services.xserver = {
-  desktopManager.xterm.enable = false;
+{
+  services.xserver = {
+    desktopManager.xterm.enable = false;
 
-  displayManager = {
-    defaultSession = "none+i3";
-  };
+    displayManager = {
+      defaultSession = "none+i3";
+    };
 
-  windowManager.i3 = {
-    enable = true;
+    windowManager.i3 = {
+      enable = true;
+    };
   };
-};
+}
 #+end_src
 
 * Networking
@@ -148,39 +175,45 @@ We're using =wpa_supplican + NetworkManager=.
 
 #+name: system-wide-networking
 #+begin_src nix
-networking.networkmanager.enable = true;
+{
+  networking.networkmanager.enable = true;
 
-# The global useDHCP flag is deprecated, therefore explicitly set to false here.
-# Per-interface useDHCP will be mandatory in the future, so this generated config
-# replicates the default behaviour.
-networking.useDHCP = false;
-networking.interfaces.enp3s0.useDHCP = true;
-networking.interfaces.wlp2s0.useDHCP = true;
+  # The global useDHCP flag is deprecated, therefore explicitly set to false here.
+  # Per-interface useDHCP will be mandatory in the future, so this generated config
+  # replicates the default behaviour.
+  networking.useDHCP = false;
+  networking.interfaces.enp3s0.useDHCP = true;
+  networking.interfaces.wlp2s0.useDHCP = true;
 
-# Open ports in the firewall.
-# networking.firewall.allowedTCPPorts = [ ... ];
-# networking.firewall.allowedUDPPorts = [ ... ];
-# Or disable the firewall altogether.
-networking.firewall.enable = false;
+  # Open ports in the firewall.
+  # networking.firewall.allowedTCPPorts = [ ... ];
+  # networking.firewall.allowedUDPPorts = [ ... ];
+  # Or disable the firewall altogether.
+  networking.firewall.enable = false;
+}
 #+end_src
 
 * Localization/keymap/timezone
 
 #+name: system-wide-localization
 #+begin_src nix
-i18n.defaultLocale = "en_US.UTF-8";
-console.keyMap = "sv-latin1";
-services.xserver.layout = "se";
-time.timeZone = "Europe/Stockholm";
+{
+  i18n.defaultLocale = "en_US.UTF-8";
+  console.keyMap = "sv-latin1";
+  services.xserver.layout = "se";
+  time.timeZone = "Europe/Stockholm";
+}
 #+end_src
 
 * Other packages
 
 ** Vim
 
-#+name: system-system-packages-vim
+#+name: system-wide-vim
 #+begin_src nix
-pkgs.vim
+{
+  environment.systemPackages = [ pkgs.vim ];
+}
 #+end_src
 
 ** Teamviewer
@@ -190,7 +223,9 @@ We sometimes want to use Teamviewer to help friends and family with IT. Teamview
 Temviewer requires ~nixpkgs.config.allowUnfree = true;~ (see: [[*Allow unfree packages][Allow unfree packages]])
 
 #+begin_src nix
+{
   #services.teamviewer.enable = true;
+}
 #+end_src
 
 We could proably find a better way to disable teamviewer by default, but this is 80/20.
@@ -199,10 +234,12 @@ We could proably find a better way to disable teamviewer by default, but this is
 
 #+name: system-wide-user-emma
 #+begin_src nix
-users.users.emma = {
-  isNormalUser = true;
-  extraGroups = [ "wheel" "networkmanager" ];
-};
+{
+  users.users.emma = {
+    isNormalUser = true;
+    extraGroups = [ "wheel" "networkmanager" ];
+  };
+}
 #+end_src
 
 The =networkmanager= group allows us to manage network connections without ~sudo~ (see: [[*Networking][Networking]])
@@ -223,7 +260,9 @@ I'm currently running my config on a single machine, so no need to split up this
 
 #+name: system-wide-machine-specific
 #+begin_src nix
-networking.hostName = "nixos";
+{
+  networking.hostName = "nixos";
+}
 #+end_src
 
 *** High-res screen
@@ -233,11 +272,13 @@ The TTY font is very small on a high-res screen, we use a large Terminus font to
 
 #+name: system-wide-high-res-1
 #+begin_src nix
-console = {
-  earlySetup = true;
-  font = "${pkgs.terminus_font}/share/consolefonts/ter-132n.psf.gz";
-  packages = with pkgs; [ terminus_font ];
-};
+{
+  console = {
+    earlySetup = true;
+    font = "${pkgs.terminus_font}/share/consolefonts/ter-132n.psf.gz";
+    packages = with pkgs; [ terminus_font ];
+  };
+}
 #+end_src
 
 These settings appear to produce as tear-free setup.
@@ -245,23 +286,27 @@ These settings appear to produce as tear-free setup.
 
 #+name: system-wide-high-res-2
 #+begin_src nix
-services.xserver = {
-  videoDrivers = [ "modesetting" ];
-  useGlamor = true;
-  dpi = 220;
-};
+{
+  services.xserver = {
+    videoDrivers = [ "modesetting" ];
+    useGlamor = true;
+    dpi = 220;
+  };
+}
 #+end_src
 
 If we where to experience graphics isses these settings could help, the perf would drop though.
 
 #+begin_src nix
-services.xserver = {
-  videoDrivers = [ "intel" ];
-  deviceSection = ''
-    Option "DRI" "2"
-    Option "TearFree" "true"
-  '';
-};
+{
+  services.xserver = {
+    videoDrivers = [ "intel" ];
+    deviceSection = ''
+      Option "DRI" "2"
+      Option "TearFree" "true"
+    '';
+  };
+}
 #+end_src
 
 *** Screen brightness
@@ -270,9 +315,11 @@ Our machine has brightness function keys that aren't configured by default, so w
 
 We use =brightnessctl= to set brightness:
 
-#+name: system-packages-brightnessctl
+#+name: system-wide-brightnessctl
 #+begin_src nix
-pkgs.brightnessctl
+{
+  environment.systemPackages = [ pkgs.brightnessctl ];
+}
 #+end_src
 
 **** TODO configure i3 in this section instead of in [[*User emma][User emma]]
@@ -286,8 +333,10 @@ pkgs.brightnessctl
 *** Sound
 #+name: system-wide-sound
 #+begin_src nix
-sound.enable = true;
-hardware.pulseaudio.enable = true;
+{
+  sound.enable = true;
+  hardware.pulseaudio.enable = true;
+}
 #+end_src
 
 **** TODO configure i3 in this section instead of in [[*User emma][User emma]]
@@ -304,15 +353,19 @@ hardware.pulseaudio.enable = true;
 *** Touchpad
 #+name: system-wide-touchpad
 #+begin_src nix
+{
   services.xserver.libinput.enable = true;
+}
 #+end_src
 
 *** Boot
 #+name: system-wide-boot
 #+begin_src nix
+{
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+}
 #+end_src
 
 *** Result of ~nixos-generate-config~
@@ -373,10 +426,12 @@ nixos-generate-config --show-hardware-config 2>&1
 
 #+name: system-wide-misc-x-server
 #+begin_src nix
+{
   services.xserver = {
     enable = true;
     autorun = true;
   };
+}
 #+end_src
 
 
@@ -384,26 +439,32 @@ nixos-generate-config --show-hardware-config 2>&1
 
 #+name: system-wide-misc-ssh
 #+begin_src nix
-services.openssh.enable = true;
+{
+  services.openssh.enable = true;
+}
 #+end_src
 
 ** Allow unfree packages
 
 #+name: system-wide-misc-allow-unfree
 #+begin_src nix
-nixpkgs.config.allowUnfree = true;
+{
+  nixpkgs.config.allowUnfree = true;
+}
 #+end_src
 
 ** State version
 #+name: system-wide-misc-state-version
 #+begin_src nix
-# This value determines the NixOS release from which the default
-# settings for stateful data, like file locations and database versions
-# on your system were taken. It‘s perfectly fine and recommended to leave
-# this value at the release version of the first install of this system.
-# Before changing this value read the documentation for this option
-# (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-system.stateVersion = "21.11"; # Did you read the comment?
+{
+  # This value determines the NixOS release from which the default
+  # settings for stateful data, like file locations and database versions
+  # on your system were taken. It‘s perfectly fine and recommended to leave
+  # this value at the release version of the first install of this system.
+  # Before changing this value read the documentation for this option
+  # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
+  system.stateVersion = "21.11"; # Did you read the comment?
+}
 #+end_src
 
 
