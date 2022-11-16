@@ -39,19 +39,22 @@
                   ((import ./emma) { pkgs = pkgs; })
                   {
                     programs.doom-emacs = {
-                      enable = true;
                       doomPrivateDir = ./doom-emacs;
-                      extraPackages = [
-                        pkgs.graphviz #Used by org-roam to render notes as a graph
-                      ];
-                      extraConfig = ''
-                                  (setq org-roam-graph-executable "${pkgs.graphviz.out}/bin/dot")
-                      '';
                     };
                   }
                   {
-                    services.emacs = {
-                      enable = true;
+                    programs.doom-emacs.extraPackages = [
+                        pkgs.multimarkdown #Previews in markdown mode
+                    ];
+                  }
+                  {
+                    programs.doom-emacs.extraPackages = [ pkgs.graphviz ];
+                  }
+                  {
+                    programs.doom-emacs = {
+                      extraConfig = ''
+                        (setq org-roam-graph-executable "${pkgs.graphviz.out}/bin/dot")
+                      '';
                     };
                   }
                 ])

@@ -8,6 +8,18 @@
 - [[#root-config][Root config]]
   - [[#utility-functions][Utility functions]]
 - [[#emacs][Emacs]]
+  - [[#moving-around][Moving around]]
+    - [[#remove-wierd-after-org-and-add-hook-org-mode-hook--call][Remove wierd ~after! org~ and ~(add-hook 'org-mode-hook ...)~ call]]
+    - [[#when-moving-multiple-lines-ex-11j-move-by-logical-lines][When moving multiple lines (ex. ~11j~); move by logical lines]]
+  - [[#org-mode][org-mode]]
+    - [[#todo-keywords][TODO-Keywords]]
+    - [[#font-faces][Font faces]]
+    - [[#which-programs-to-use-for-opening-org-links][Which programs to use for opening org links]]
+    - [[#spell-checking][Spell checking]]
+  - [[#misc][Misc]]
+    - [[#flash-cards-with-org-drill][Flash cards with =org-drill=.]]
+    - [[#zettelkasten-method-with-org-roam-v2][Zettelkasten-method with =org-roam v2=.]]
+    - [[#relative-line-numbering][Relative line numbering]]
 - [[#desktop-environment][Desktop environment]]
 - [[#networking][Networking]]
   -  [[#managing-networkmanager-connections-delete-connections-see-passwords][Managing =NetworkManager= connections (delete connections, see passwords)]]
@@ -22,7 +34,7 @@
     - [[#touchpad][Touchpad]]
     - [[#boot][Boot]]
     - [[#result-of-nixos-generate-config][Result of ~nixos-generate-config~.]]
-- [[#misc][Misc]]
+- [[#misc-1][Misc]]
   - [[#use-x-server][Use X server:]]
   - [[#ssh][SSH]]
   - [[#state-version][State version]]
@@ -34,7 +46,7 @@
   - [[#pomodoro-timer-in-emacs][Pomodoro timer in emacs]]
   - [[#latexpreview-sometimes-fails][Latexpreview sometimes fails]]
   - [[#make-ditaa-code-blocks-work-with-org-babel][Make =ditaa= code blocks work with =org-babel=.]]
-  - [[#proj-c-move-all-of-the-contents-of-doom-emacs-into-the-literate-config][PROJ [#C] Move all of the contents of ./doom-emacs/ into the literate config.]]
+  - [[#move-doom-emacsinitel-into-the-literate-config][Move ~./doom-emacs/init.el~ into the literate config.]]
   - [[#proj-c-move-all-of-the-contents-of-emma-into-the-literate-config][PROJ [#C] Move all of the contents of ./emma/ into the literate config.]]
 
 * How to use
@@ -102,6 +114,15 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
                   ((import ./emma) { pkgs = pkgs; })
                   <<users-emma-emacs-1>>
                   <<users-emma-emacs-2>>
+                  <<users-emma-emacs-3>>
+                  <<users-emma-emacs-zettelkasten>>
+                  {
+                    programs.doom-emacs = {
+                      extraConfig = ''
+                        <<users-emma-emacs-extra-config-zettelkasten>>
+                      '';
+                    };
+                  }
                 ])
               ];
             };
@@ -183,40 +204,257 @@ lib: {
 #+end_src
 
 * Emacs
-We're using =Doom-Emacs=:
+We're using [[https://github.com/doomemacs/doomemacs][doom-emacs]]:
 
 #+name: inputs-emacs
 #+begin_src nix
 nix-doom-emacs.url = "github:nix-community/nix-doom-emacs";
 #+end_src
 
-Most of the configuration for Emacs is outside this document in[[ ./doom-emacs/]]:
+There are three main ~.el~ files used for configuring doom-emacs:
+1) ~config.el~ for configuring thins
+2) ~init.el~ for enabling doom-emacs module
+3) ~packages.el~ for installing packages that aren't part of any doom-emacs module
+
+~config.el~ and ~packages.el~ are tangled from this document whereas ~init.el~ is edited directly. These three files live in[[file:doom-emacs/][ ./doom-emacs/]]. We tell doom-emacs to find the configuration files there:
 
 #+name: users-emma-emacs-1
 #+begin_src nix
 {
   programs.doom-emacs = {
-    enable = true;
     doomPrivateDir = ./doom-emacs;
-    extraPackages = [
-      pkgs.graphviz #Used by org-roam to render notes as a graph
-    ];
-    extraConfig = ''
-                (setq org-roam-graph-executable "${pkgs.graphviz.out}/bin/dot")
-    '';
   };
+}
+#+end_src
+
+The configuration in the next block should really be in another, but for now we let it live here:
+
+#+name: users-emma-emacs-2
+#+begin_src nix
+{
+  programs.doom-emacs.extraPackages = [
+      pkgs.multimarkdown #Previews in markdown mode
+  ];
 }
 #+end_src
 
 Lastly we run the server upon login in:
 
-#+name: users-emma-emacs-2
+#+name: users-emma-emacs-3
 #+begin_src nix
 {
-  services.emacs = {
-    enable = true;
-  };
+  programs.doom-emacs.enable = true;
+  services.emacs.enable = true;
 }
+#+end_src
+
+** Moving around
+When moving around we want to move by visual lines instead of actual lines. I.e. if we have this
+
+#+begin_quote
+
+                    + -- Location of the cursor marked with <*>
+                    v
+1| Here's a normal <l>ine of text              |
+2| Some really looooooooong text that won't f- | <--- Edge of the window
+.| it in the window and is therefore wrapped.  |
+3| Here's another not-so-long line of text     |
+#+end_quote
+
+And we press ~j~ we wan't the cursor to end up here:
+
+#+begin_quote
+1| Here's a normal line of text                  |
+2| Some really loo<o>oooooong text that won't f- | <--- Edge of the window
+.| it in the window and is therefore wrapped.    |
+3| Here's another not-so-long line of text       |
+#+end_quote
+
+But by default we would move by "logical" lines and notes visual ones, ending up here:
+
+#+begin_quote
+1| Here's a normal line of text                |
+2| Some really looooooooong text that won't f- | <--- Edge of the window
+.| it in the window and is therefore wrapped.  |
+3| Here's another <n>ot-so-long line of text   |
+                   ^
+                   + -- It _looks_ like we've moved down by two lines.
+#+end_quote
+
+The config for this looks like:
+
+#+begin_src elisp :tangle ./doom-emacs/config.el
+(add-hook 'org-mode-hook 'visual-line-mode)
+
+(after! org
+  (define-key evil-normal-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
+  (define-key evil-motion-state-map (kbd "<remap> <evil-previous-line>") 'evil-previous-visual-line)
+  (define-key evil-motion-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
+  (define-key evil-normal-state-map (kbd "<remap> <evil-previous-line>") 'evil-previous-visual-line)
+  (define-key evil-normal-state-map (kbd "<remap> <evil-backward-char>") 'left-char)
+  (define-key evil-motion-state-map (kbd "<remap> <evil-forward-char>") 'right-char)
+  (define-key evil-normal-state-map (kbd "<remap> <evil-backward-char>") 'left-char)
+  (define-key evil-motion-state-map (kbd "<remap> <evil-forward-char>") 'right-char)
+)
+#+end_src
+
+*** TODO [#C] Remove wierd ~after! org~ and ~(add-hook 'org-mode-hook ...)~ call
+Is it necesary? Was it added because the rebinds would get overriden otherwise? If so there should be a more suitable hook than ~org~ for this, it's kinda confusing.
+
+*** TODO [#C] When moving multiple lines (ex. ~11j~); move by logical lines
+When displaying relative line numbers they are displayed following logical lines, and when we're moving multipel lines at once the relative line numbers are what we're looking at, therefore moving multie lines should be interpreted as moving by logical lines
+** org-mode
+*** TODO-Keywords
+We define the following keywords:
+
+#+begin_src elisp :tangle ./doom-emacs/config.el
+(after! org
+  (setq org-todo-keywords
+        '((sequence "TODO(t)" "NEXT(n)" "PROJ(p)" "WATCH(w)" "HOLD(h)" "BACKLOG(b)" "|" "DONE(d)" "KILL(k)")
+          (sequence "MEET(m)" "|" "MEET_(_)")
+          (sequence "MAYBE/SOMEDAY(s)" "|" "ABANDONED(a)"))))
+#+end_src
+
+With the following colors:
+
+#+begin_src elisp :tangle ./doom-emacs/config.el
+(after! org
+  (setq org-todo-keyword-faces
+        '(("TODO" . "medium sea green")
+          ("PROJ" . "dark cyan")
+          ("WATCH" . "khaki")
+          ("HOLD" . "coral")
+          ("BACKLOG" . "yellow green")
+          ("MEET" . "light sea green")
+          ("MAYBE/SOMEDAY" . "pale goldenrod"))))
+#+end_src
+
+We can run  ~M-x list-colors-display~ to see a list of available color names.
+
+*** Font faces
+
+When making ~*bold*~, ~/italic/~, etc we don't want to show the actual markers:
+
+#+begin_src elisp :tangle ./doom-emacs/config.el
+(after! org (setq org-hide-emphasis-markers t))
+#+end_src
+
+We wan't most of out non-code text to be /variable-pitch/ a.k.a. non-monospace. We enable variable-pitch:
+
+#+begin_src elisp :tangle ./doom-emacs/config.el
+(add-hook 'org-mode-hook 'variable-pitch-mode)
+#+end_src
+
+Now we setup the font faces: (If you're in a org document and want to know the face a character; put you cursor over it and type ~SPC h '~, then go to the bottom of the buffer and look for a =face= entry.
+
+#+begin_src elisp :tangle ./doom-emacs/config.el
+(after! org
+  (custom-theme-set-faces 'user
+                          '(org-level-1 ((t (:foreground "gray" :height 1.3 :weight bold))))
+                          '(org-level-2 ((t (:foreground "gray" :height 1.075 :weight bold))))
+                          '(org-level-3 ((t (:foreground "gray" :height 1.075 :weight bold))))
+                          '(org-level-4 ((t (:foreground "gray" :height 1.075 :weight bold))))
+                          '(org-level-5 ((t (:foreground "gray" :height 1.075 :weight bold))))
+                          '(org-level-6 ((t (:foreground "gray" :height 1.075 :weight bold))))
+                          '(org-level-7 ((t (:foreground "gray" :height 1.075 :weight bold))))
+                          '(org-level-8 ((t (:foreground "gray" :height 1.075 :weight bold))))
+                          '(org-block ((t (:inherit (shadow fixed-pitch)))))
+                          '(org-code ((t (:inherit (shadow fixed-pitch)))))
+                          '(org-document-info ((t (:foreground "dark orange"))))
+                          '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
+                          '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
+                          '(org-link ((t (:foreground "royal blue" :underline t))))
+                          '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+                          '(org-property-value ((t (:inherit fixed-pitch))) t)
+                          '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+                          '(org-table ((t (:inherit fixed-pitch :foreground "#83a598"))))
+                          '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.8))))
+                          '(org-verbatim ((t (:inherit (shadow fixed-pitch)))))
+                          '(line-number ((t (:inherit fixed-pitch :foreground "#3f444a"))))
+                          '(line-number-current-line ((t (:inherit fixed-pitch :foreground "#bbc2cf"))))
+                          ))
+#+end_src
+
+*** Which programs to use for opening org links
+
+#+begin_src elisp :tangle ./doom-emacs/config.el
+(after! org
+  (setq org-file-apps
+        '((auto-mode . emacs)
+          ("\\.mm\\'" . default)
+          ("\\.x?html?\\'" . default)
+          ("\\.pdf\\'" . "firefox %s"))))
+#+end_src
+
+**** TODO Configure org link opening behaviour in the respective program section
+
+For example opening web pages and pdf's with firefox should be configured in a firefox section.
+
+*** Spell checking
+This hasn't been configured successfully, the broken config that might be useful for a future atempt looks like this:
+
+~config.el~
+#+begin_src elisp
+(with-eval-after-load "ispell"
+  ;; Configure 'LANG', otherwise 'ispell.el' cannot find a 'default
+  ;; dictionary' even though multiple dictionaries will be configured
+  ;; in next line.
+  (setenv "LANG" "en_US.UTF-8")
+  (setq ispell-program-name "hunspell")
+
+  (setq ispell-dictionary "en_US,sv_SE")
+
+  ;; 'ispell-set-spellchecker-params' has to be called
+  ;; before 'ispell-hunspell-add-multi-dic' will work
+  (ispell-set-spellchecker-params)
+  (ispell-hunspell-add-multi-dic "en_US,sv_SE")
+
+  ;; For saving words to the personal dictionary, don't infer it from
+  ;; the locale, otherwise it would save to ~/.hunspell_de_DE.
+  (setq ispell-personal-dictionary "~/.hunspell_personal_dictionary"))
+
+  ;; The personal dictionary file has to exist, otherwise hunspell will
+  ;; silently not use it.
+  (unless (file-exists-p ispell-personal-dictionary)
+    (write-region "" nil ispell-personal-dictionary nil 0))
+#+end_src
+
+#+begin_src nix
+{
+  let
+    hunspell = hunspellWithDicts ( with hunspellDicts; [ sv-se  en-us ] );
+  in
+  extraConfig = ''
+    (setq exec-path (append exec-path '("${hunspell}/bin")))
+  '';
+}
+#+end_src
+** Misc
+*** Flash cards with =org-drill=.
+All we need to do is add the following to ~packages.el~
+
+#+begin_src elisp :tangle ./doom-emacs/packages.el
+(package! org-drill)
+#+end_src
+*** Zettelkasten-method with =org-roam v2=.
+We install this by manually adding the ~+roam2~ flag to the ~org~ module in ~init.el~.
+
+org-roam uses /graphviz/ to generate a graph from all of the notes. We install the program and make sure that emacs can find the binary:
+
+#+name: users-emma-emacs-zettelkasten
+#+begin_src nix
+{
+  programs.doom-emacs.extraPackages = [ pkgs.graphviz ];
+}
+#+end_src
+
+#+name: users-emma-emacs-extra-config-zettelkasten
+#+begin_src elisp
+(setq org-roam-graph-executable "${pkgs.graphviz.out}/bin/dot")
+#+end_src
+*** Relative line numbering
+#+begin_src elisp tangle: ./doom-emacs/config.el
+(setq display-line-numbers-type 'relative)
 #+end_src
 
 * Desktop environment
@@ -494,7 +732,6 @@ nixos-generate-config --show-hardware-config 2>&1
 }
 #+end_src
 
-
 ** SSH
 
 #+name: system-wide-misc-ssh
@@ -550,5 +787,5 @@ Relevant sections:
 ** TODO [#C] Pomodoro timer in emacs
 ** TODO [#C] [[file:~/org/flashcards.org::*Latexpreview sometimes fails][Latexpreview sometimes fails]]
 ** TODO [#C] Make =ditaa= code blocks work with =org-babel=.
-** PROJ [#C] Move all of the contents of[[file:doom-emacs/][ ./doom-emacs/]] into the literate config.
+** TODO [#C] Move ~./doom-emacs/init.el~ into the literate config.
 ** PROJ [#C] Move all of the contents of [[file:emma/][./emma/]] into the literate config.
