@@ -219,9 +219,6 @@ Lastly we run the server upon login in:
 }
 #+end_src
 
-,#+begin_src nix
-#+end_src
-
 * Desktop environment
 
 Use =i3= as the window manager:
@@ -551,7 +548,7 @@ Relevant sections:
     is ~org-file-apps~ the relevant variable?
 
 ** TODO [#C] Pomodoro timer in emacs
-** [[file:~/org/flashcards.org::*Latexpreview sometimes fails][Latexpreview sometimes fails]]
+** TODO [#C] [[file:~/org/flashcards.org::*Latexpreview sometimes fails][Latexpreview sometimes fails]]
 ** TODO [#C] Make =ditaa= code blocks work with =org-babel=.
 ** PROJ [#C] Move all of the contents of[[file:doom-emacs/][ ./doom-emacs/]] into the literate config.
 ** PROJ [#C] Move all of the contents of [[file:emma/][./emma/]] into the literate config.
