@@ -58,20 +58,20 @@ in
       };
       ignores = [ "*.swp" ];
     };
-    doom-emacs = {
-      enable = true;
-      doomPrivateDir = ./doom-emacs;
-      extraPackages = with pkgs; [
-        graphviz # Used by org-roam to render notes as a graph
-      ];
-      extraConfig = with pkgs; ''
-        (setq org-roam-graph-executable "${graphviz.out}/bin/dot")
-      '';
-    };
+    #doom-emacs = {
+    #  enable = true;
+    #  doomPrivateDir = ./doom-emacs;
+    #  extraPackages = with pkgs; [
+    #    graphviz # Used by org-roam to render notes as a graph
+    #  ];
+    #  extraConfig = with pkgs; ''
+    #    (setq org-roam-graph-executable "${graphviz.out}/bin/dot")
+    #  '';
+    #};
   };
-  services.emacs = {
-    enable = true;
-  };
+  #services.emacs = {
+  #  enable = true;
+  #};
   home.shellAliases = {
     spectre = ''SPECTRE_USERNAME="emmabastas" ${spectre-cli}/bin/spectre -q'';
     spectre_ = ''${spectre-cli}/bin/spectre -q'';

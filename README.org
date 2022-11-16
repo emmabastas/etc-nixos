@@ -7,6 +7,7 @@
   - [[#apply-the-config-with-dry-activate--test--switch][Apply the config with ~dry-activate~ / ~test~ / ~switch~.]]
 - [[#root-config][Root config]]
   - [[#utility-functions][Utility functions]]
+- [[#emacs][Emacs]]
 - [[#desktop-environment][Desktop environment]]
 - [[#networking][Networking]]
   -  [[#managing-networkmanager-connections-delete-connections-see-passwords][Managing =NetworkManager= connections (delete connections, see passwords)]]
@@ -33,6 +34,8 @@
   - [[#pomodoro-timer-in-emacs][Pomodoro timer in emacs]]
   - [[#latexpreview-sometimes-fails][Latexpreview sometimes fails]]
   - [[#make-ditaa-code-blocks-work-with-org-babel][Make =ditaa= code blocks work with =org-babel=.]]
+  - [[#proj-c-move-all-of-the-contents-of-doom-emacs-into-the-literate-config][PROJ [#C] Move all of the contents of ./doom-emacs/ into the literate config.]]
+  - [[#proj-c-move-all-of-the-contents-of-emma-into-the-literate-config][PROJ [#C] Move all of the contents of ./emma/ into the literate config.]]
 
 * How to use
 
@@ -67,7 +70,7 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
       url = "github:nix-community/home-manager/release-22.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nix-doom-emacs.url = "github:nix-community/nix-doom-emacs";
+    <<inputs-emacs>>
   };
 
   outputs = { self, nixpkgs, home-manager, nix-doom-emacs, ... }:
@@ -95,7 +98,11 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
               useUserPackages = true;
               users.emma = lib.mkMerge [
                 nix-doom-emacs.hmModule
-                (import ./emma)
+                ({ pkgs, ... }: utils.recursiveMerge [
+                  ((import ./emma) { pkgs = pkgs; })
+                  <<users-emma-emacs-1>>
+                  <<users-emma-emacs-2>>
+                ])
               ];
             };
           }
@@ -173,6 +180,46 @@ lib: {
     <<nixos-generate-config()>>
   );
 }
+#+end_src
+
+* Emacs
+We're using =Doom-Emacs=:
+
+#+name: inputs-emacs
+#+begin_src nix
+nix-doom-emacs.url = "github:nix-community/nix-doom-emacs";
+#+end_src
+
+Most of the configuration for Emacs is outside this document in[[ ./doom-emacs/]]:
+
+#+name: users-emma-emacs-1
+#+begin_src nix
+{
+  programs.doom-emacs = {
+    enable = true;
+    doomPrivateDir = ./doom-emacs;
+    extraPackages = [
+      pkgs.graphviz #Used by org-roam to render notes as a graph
+    ];
+    extraConfig = ''
+                (setq org-roam-graph-executable "${pkgs.graphviz.out}/bin/dot")
+    '';
+  };
+}
+#+end_src
+
+Lastly we run the server upon login in:
+
+#+name: users-emma-emacs-2
+#+begin_src nix
+{
+  services.emacs = {
+    enable = true;
+  };
+}
+#+end_src
+
+,#+begin_src nix
 #+end_src
 
 * Desktop environment
@@ -506,3 +553,5 @@ Relevant sections:
 ** TODO [#C] Pomodoro timer in emacs
 ** [[file:~/org/flashcards.org::*Latexpreview sometimes fails][Latexpreview sometimes fails]]
 ** TODO [#C] Make =ditaa= code blocks work with =org-babel=.
+** PROJ [#C] Move all of the contents of[[file:doom-emacs/][ ./doom-emacs/]] into the literate config.
+** PROJ [#C] Move all of the contents of [[file:emma/][./emma/]] into the literate config.

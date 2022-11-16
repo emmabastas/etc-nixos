@@ -35,7 +35,26 @@
               useUserPackages = true;
               users.emma = lib.mkMerge [
                 nix-doom-emacs.hmModule
-                (import ./emma)
+                ({ pkgs, ... }: utils.recursiveMerge [
+                  ((import ./emma) { pkgs = pkgs; })
+                  {
+                    programs.doom-emacs = {
+                      enable = true;
+                      doomPrivateDir = ./doom-emacs;
+                      extraPackages = [
+                        pkgs.graphviz #Used by org-roam to render notes as a graph
+                      ];
+                      extraConfig = ''
+                                  (setq org-roam-graph-executable "${pkgs.graphviz.out}/bin/dot")
+                      '';
+                    };
+                  }
+                  {
+                    services.emacs = {
+                      enable = true;
+                    };
+                  }
+                ])
               ];
             };
           }
