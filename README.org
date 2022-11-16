@@ -31,6 +31,8 @@
   - [[#setup-home-folder-syncing-with-mega][Setup home folder syncing with Mega]]
   - [[#sometimes-only-the-first-time-when-opening-a-hyperlink-in-emacs-they-are-opened-as-two-tabs-in-ff--one-tab-in-chrome][Sometimes (only the first time?) when opening a hyperlink in emacs they are opened as two tabs in FF + one tab in Chrome.]]
   - [[#pomodoro-timer-in-emacs][Pomodoro timer in emacs]]
+  - [[#latexpreview-sometimes-fails][Latexpreview sometimes fails]]
+  - [[#make-ditaa-code-blocks-work-with-org-babel][Make =ditaa= code blocks work with =org-babel=.]]
 
 * How to use
 
@@ -469,7 +471,6 @@ nixos-generate-config --show-hardware-config 2>&1
 }
 #+end_src
 
-
 * Mathematica
 Mathematica is proprietary software, and the nix package requires ~Mathematica_13.0.1_BNDL_LINUX.sh~ to already be a part of the store.
 The file can be downoaded by going to [[https://account.wolfram.com/products]] ~> User Portal~ and doing a =Drect File Download=.
@@ -488,6 +489,7 @@ After that we can install the nix package:
 }
 #+end_src
 
+
 * Global TODOS
 ** TODO [#B] Should =i3= be configured in nix instead of in a separate config file?
 Relevant sections:
@@ -500,3 +502,4 @@ Relevant sections:
 
 ** TODO [#C] Pomodoro timer in emacs
 ** [[file:~/org/flashcards.org::*Latexpreview sometimes fails][Latexpreview sometimes fails]]
+** TODO [#C] Make =ditaa= code blocks work with =org-babel=.
