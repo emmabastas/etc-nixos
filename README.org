@@ -2,12 +2,13 @@
 
 * Table of contents :TOC_3:
 - [[#how-to-use][How to use]]
-  - [[#tangle][Tangle]]
+  - [[#tangle][Tangle.]]
   - [[#make-sure-relevant-files-are-checking-into-version-control][Make sure relevant files are checking into version control]]
-  - [[#apply-the-config-with-dry-activate--test--switch][Apply the config with ~dry-activate~ / ~test~ / ~switch~]]
+  - [[#apply-the-config-with-dry-activate--test--switch][Apply the config with ~dry-activate~ / ~test~ / ~switch~.]]
 - [[#root-config][Root config]]
 - [[#desktop-environment][Desktop environment]]
 - [[#networking][Networking]]
+  -  [[#managing-networkmanager-connections-delete-connections-see-passwords][Managing =NetworkManager= connections (delete connections, see passwords)]]
 - [[#localizationkeymaptimezone][Localization/keymap/timezone]]
 - [[#other-packages][Other packages]]
   - [[#vim][Vim]]
@@ -19,7 +20,7 @@
     - [[#sound][Sound]]
     - [[#touchpad][Touchpad]]
     - [[#boot][Boot]]
-    - [[#result-of-nixos-generate-config][Result of ~nixos-generate-config~]]
+    - [[#result-of-nixos-generate-config][Result of ~nixos-generate-config~.]]
 - [[#misc][Misc]]
   - [[#use-x-server][Use X server:]]
   - [[#ssh][SSH]]
@@ -28,10 +29,12 @@
 - [[#global-todos][Global TODOS]]
   - [[#should-i3-be-configured-in-nix-instead-of-in-a-separate-config-file][Should =i3= be configured in nix instead of in a separate config file?]]
   - [[#setup-home-folder-syncing-with-mega][Setup home folder syncing with Mega]]
+  - [[#sometimes-only-the-first-time-when-opening-a-hyperlink-in-emacs-they-are-opened-as-two-tabs-in-ff--one-tab-in-chrome][Sometimes (only the first time?) when opening a hyperlink in emacs they are opened as two tabs in FF + one tab in Chrome.]]
+  - [[#pomodoro-timer-in-emacs][Pomodoro timer in emacs]]
 
 * How to use
 
-** Tangle
+** Tangle.
 #+begin_src elisp :noweb yes
 (org-babel-tangle)
 #+end_src
@@ -43,7 +46,7 @@
 
 When running a nix flake unstaged files are ignored (see[[https://github.com/NixOS/nix/pull/6858][ this issue]]) which can result in some confusing error messages about files not existing. Make sure all the relevant files are (temporarily) staged.
 
-** Apply the config with ~dry-activate~ / ~test~ / ~switch~
+** Apply the config with ~dry-activate~ / ~test~ / ~switch~.
 
 ~nixos-rebuild <dry-activate | test | switch> --flake .~
 
@@ -196,6 +199,10 @@ We're using =wpa_supplican + NetworkManager=.
   networking.firewall.enable = false;
 }
 #+end_src
+
+**  Managing =NetworkManager= connections (delete connections, see passwords)
+
+Connections are stored in [[/etc/NetworkManager/system-connections/]] (requires ~sudo~).
 
 * Localization/keymap/timezone
 
@@ -372,7 +379,7 @@ We use =brightnessctl= to set brightness:
 }
 #+end_src
 
-*** Result of ~nixos-generate-config~
+*** Result of ~nixos-generate-config~.
 ~nixos-generate-config~ looks at our hardware and gives us some nice config for it
 
 #+name: nixos-generate-config
@@ -482,9 +489,13 @@ After that we can install the nix package:
 #+end_src
 
 * Global TODOS
-** TODO Should =i3= be configured in nix instead of in a separate config file?
+** TODO [#B] Should =i3= be configured in nix instead of in a separate config file?
 Relevant sections:
     - [[Screen brightness]]
     - [[Sound]]
 
-** TODO Setup home folder syncing with Mega
+** TODO [#A] Setup home folder syncing with Mega
+** TODO [#C] Sometimes (only the first time?) when opening a hyperlink in emacs they are opened as two tabs in FF + one tab in Chrome.
+    is ~org-file-apps~ the relevant variable?
+
+** TODO [#C] Pomodoro timer in emacs
