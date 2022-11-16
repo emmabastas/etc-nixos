@@ -499,3 +499,4 @@ Relevant sections:
     is ~org-file-apps~ the relevant variable?
 
 ** TODO [#C] Pomodoro timer in emacs
+** [[file:~/org/flashcards.org::*Latexpreview sometimes fails][Latexpreview sometimes fails]]
