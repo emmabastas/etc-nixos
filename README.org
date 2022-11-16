@@ -6,6 +6,7 @@
   - [[#make-sure-relevant-files-are-checking-into-version-control][Make sure relevant files are checking into version control]]
   - [[#apply-the-config-with-dry-activate--test--switch][Apply the config with ~dry-activate~ / ~test~ / ~switch~.]]
 - [[#root-config][Root config]]
+  - [[#utility-functions][Utility functions]]
 - [[#desktop-environment][Desktop environment]]
 - [[#networking][Networking]]
   -  [[#managing-networkmanager-connections-delete-connections-see-passwords][Managing =NetworkManager= connections (delete connections, see passwords)]]
@@ -81,39 +82,8 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
 
     lib = nixpkgs.lib;
 
-    allSame = with self.inputs.nixpkgs.lib; values:
-      if tail values == []
-        then true
-      else if head values == head (tail values)
-        then allSame (tail values)
-      else false;
+    utils = (import ./utils.nix) lib;
 
-    join = with self.inputs.nixpkgs.lib; sep: values:
-      if values == []
-        then ""
-      else if tail values == []
-        then head values
-      else "${head values}${sep}${join sep (tail values)}";
-
-    # based off https://stackoverflow.com/a/54505212
-    recursiveMerge = with self.inputs.nixpkgs.lib; attrList:
-      let f = attrPath:
-        zipAttrsWith (n: values:
-          if tail values == []
-            then head values
-          else if all isList values
-            then unique (concatLists values)
-          else if all isAttrs values
-            then f (attrPath ++ [n]) values
-          else if allSame values
-            then head values
-          else abort "Values in ${join "." attrPath} can't be merged."
-        );
-      in f [] attrList;
-
-    hardware-config = (
-      <<nixos-generate-config()>>
-    );
   in {
     nixosConfigurations = {
       nixos = lib.nixosSystem {
@@ -127,9 +97,9 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
               <<home-manager-emma>>
             };
           }
-          ({ config, pkgs, ... }: (recursiveMerge [
+          ({ config, pkgs, ... }: (utils.recursiveMerge [
             {
-              imports = [ hardware-config ];
+              imports = [ utils.hardwareConfig ];
             }
             <<system-wide-user-emma>>
             <<system-wide-boot>>
@@ -154,6 +124,47 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
       };
     };
   };
+}
+#+end_src
+
+** Utility functions
+
+#+name: utility-functions
+#+begin_src nix :noweb yes :tangle utils.nix
+lib: {
+  allSame = with lib; values:
+    if tail values == []
+      then true
+    else if head values == head (tail values)
+      then allSame (tail values)
+    else false;
+
+  join = with lib; sep: values:
+    if values == []
+      then ""
+    else if tail values == []
+      then head values
+    else "${head values}${sep}${join sep (tail values)}";
+
+  # based off https://stackoverflow.com/a/54505212
+  recursiveMerge = with lib; attrList:
+    let f = attrPath:
+      zipAttrsWith (n: values:
+        if tail values == []
+          then head values
+        else if all isList values
+          then unique (concatLists values)
+        else if all isAttrs values
+          then f (attrPath ++ [n]) values
+        else if allSame values
+          then head values
+        else abort "Values in ${join "." attrPath} can't be merged."
+      );
+    in f [] attrList;
+
+  hardwareConfig = (
+    <<nixos-generate-config()>>
+  );
 }
 #+end_src
 
