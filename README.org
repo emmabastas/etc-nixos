@@ -14,7 +14,6 @@
 - [[#other-packages][Other packages]]
   - [[#vim][Vim]]
   - [[#teamviewer][Teamviewer]]
-- [[#user-emma][User emma]]
 - [[#machine-specific-configuration][Machine specific configuration]]
     - [[#high-res-screen][High-res screen]]
     - [[#screen-brightness][Screen brightness]]
@@ -94,16 +93,24 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
-              <<home-manager-emma>>
+              users.emma = lib.mkMerge [
+                nix-doom-emacs.hmModule
+                (import ./emma)
+              ];
             };
           }
           ({ config, pkgs, ... }: (utils.recursiveMerge [
             {
               imports = [ utils.hardwareConfig ];
+
+              users.users.emma = {
+                isNormalUser = true;
+                extraGroups = [ "wheel" ];
+              };
             }
-            <<system-wide-user-emma>>
             <<system-wide-boot>>
-            <<system-wide-networking>>
+            <<system-wide-networking-1>>
+            <<system-wide-networking-2>>
             <<system-wide-localization>>
             <<system-wide-machine-specific>>
             <<system-wide-high-res-1>>
@@ -193,7 +200,7 @@ Use =i3= as the window manager:
 
 We're using =wpa_supplican + NetworkManager=.
 
-#+name: system-wide-networking
+#+name: system-wide-networking-1
 #+begin_src nix
 {
   networking.networkmanager.enable = true;
@@ -210,6 +217,15 @@ We're using =wpa_supplican + NetworkManager=.
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   networking.firewall.enable = false;
+}
+#+end_src
+
+We also want to use =NetworkManager= witout ~sudo~:
+
+#+name: system-wide-networking-2
+#+begin_src nix
+{
+  users.users.emma.extraGroups = [ "networkmanager" ];
 }
 #+end_src
 
@@ -253,30 +269,6 @@ We sometimes want to use Teamviewer to help friends and family with IT. Teamview
 #+end_src
 
 We could proably find a better way to disable teamviewer by default, but this is 80/20.
-
-* User emma
-
-#+name: system-wide-user-emma
-#+begin_src nix
-{
-  users.users.emma = {
-    isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" ];
-  };
-}
-#+end_src
-
-The =networkmanager= group allows us to manage network connections without ~sudo~ (see: [[*Networking][Networking]])
-
-The rest of the configuration lives outside this document in[[file:emma/][ ./emma]]:
-
-#+name: home-manager-emma
-#+begin_src nix
-users.emma = lib.mkMerge [
-  nix-doom-emacs.hmModule
-  (import ./emma)
-];
-#+end_src
 
 * Machine specific configuration
 

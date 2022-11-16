@@ -42,11 +42,10 @@
           ({ config, pkgs, ... }: (utils.recursiveMerge [
             {
               imports = [ utils.hardwareConfig ];
-            }
-            {
+
               users.users.emma = {
                 isNormalUser = true;
-                extraGroups = [ "wheel" "networkmanager" ];
+                extraGroups = [ "wheel" ];
               };
             }
             {
@@ -69,6 +68,9 @@
               # networking.firewall.allowedUDPPorts = [ ... ];
               # Or disable the firewall altogether.
               networking.firewall.enable = false;
+            }
+            {
+              users.users.emma.extraGroups = [ "networkmanager" ];
             }
             {
               i18n.defaultLocale = "en_US.UTF-8";
