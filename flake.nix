@@ -39,13 +39,23 @@
                   ((import ./emma) { pkgs = pkgs; })
                   {
                     programs.doom-emacs = {
-                      doomPrivateDir = ./doom-emacs;
+                      doomPrivateDir = pkgs.linkFarm "doom-config" [
+                        { name = "config.el"; path = ./doom-emacs/config.el; }
+                        { name = "init.el";   path = ./doom-emacs/init.el; }
+                        # Should *not* fail because we're building our straight environment
+                        # using the doomPackageDir, not the doomPrivateDir.
+                        {
+                          name = "packages.el";
+                          path = pkgs.writeText "packages.el" "(package! not-a-valid-package)";
+                        }
+                      ];
+                      doomPackageDir = pkgs.linkFarm "doom-config" [
+                        # straight needs a (possibly empty) `config.el` file to build
+                        { name = "config.el";   path = pkgs.emptyFile; }
+                        { name = "init.el";     path = ./doom-emacs/init.el; }
+                        { name = "packages.el"; path = ./doom-emacs/packages.el; }
+                      ];
                     };
-                  }
-                  {
-                    programs.doom-emacs.extraPackages = [
-                        pkgs.multimarkdown #Previews in markdown mode
-                    ];
                   }
                   {
                     programs.doom-emacs.enable = true;

@@ -119,7 +119,6 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
                   ((import ./emma) { pkgs = pkgs; })
                   <<users-emma-emacs-1>>
                   <<users-emma-emacs-2>>
-                  <<users-emma-emacs-3>>
                   <<users-emma-emacs-zettelkasten>>
                   <<users-emma-emacs-ditaa>>
                   {
@@ -219,35 +218,46 @@ nix-doom-emacs.url = "github:nix-community/nix-doom-emacs";
 #+end_src
 
 There are three main ~.el~ files used for configuring doom-emacs:
-1) ~config.el~ for configuring thins
+1) ~config.el~ all "normal" configuration goes here
 2) ~init.el~ for enabling doom-emacs module
 3) ~packages.el~ for installing packages that aren't part of any doom-emacs module
 
-~config.el~ and ~packages.el~ are tangled from this document whereas ~init.el~ is edited directly. These three files live in[[file:doom-emacs/][ ./doom-emacs/]]. We tell doom-emacs to find the configuration files there:
+~config.el~ and ~packages.el~ are tangled from this document whereas ~init.el~ is edited directly. They all end up in ~./doom-emacs/~.
+
+
+For [[https://github.com/nix-community/nix-doom-emacs/pull/303][caching reasons]] nix-doom-emacs provides two directories for the config files, one for ~config.el~ and one for ~packages.el~. Doom-emacs has to be rebuild everytime ~packages.el~ is changed.
+~init.el~ goes in both of these directories (??).
+
+So what happens is we make two derivations containing files in ~./doom-emacs/~ then thell doom-emacs to find the configuration files in these derivations
+(This snippet of code is based off: https://github.com/nix-community/nix-doom-emacs/blob/9cbb1c3aa7b957bd2f88215c08c3cb3f55f8e2bb/checks.nix#L46-L64)
 
 #+name: users-emma-emacs-1
 #+begin_src nix
 {
   programs.doom-emacs = {
-    doomPrivateDir = ./doom-emacs;
+    doomPrivateDir = pkgs.linkFarm "doom-config" [
+      { name = "config.el"; path = ./doom-emacs/config.el; }
+      { name = "init.el";   path = ./doom-emacs/init.el; }
+      # Should *not* fail because we're building our straight environment
+      # using the doomPackageDir, not the doomPrivateDir.
+      {
+        name = "packages.el";
+        path = pkgs.writeText "packages.el" "(package! not-a-valid-package)";
+      }
+    ];
+    doomPackageDir = pkgs.linkFarm "doom-config" [
+      # straight needs a (possibly empty) `config.el` file to build
+      { name = "config.el";   path = pkgs.emptyFile; }
+      { name = "init.el";     path = ./doom-emacs/init.el; }
+      { name = "packages.el"; path = ./doom-emacs/packages.el; }
+    ];
   };
 }
 #+end_src
 
-The configuration in the next block should really be in another, but for now we let it live here:
+Lastly we run the emacs server on login:
 
 #+name: users-emma-emacs-2
-#+begin_src nix
-{
-  programs.doom-emacs.extraPackages = [
-      pkgs.multimarkdown #Previews in markdown mode
-  ];
-}
-#+end_src
-
-Lastly we run the server upon login in:
-
-#+name: users-emma-emacs-3
 #+begin_src nix
 {
   programs.doom-emacs.enable = true;
@@ -437,10 +447,16 @@ This hasn't been configured successfully, the broken config that might be useful
 }
 #+end_src
 ** Flash cards with =org-drill=.
-All we need to do is add the following to ~packages.el~
+We install org-drill via ~packages.el~:
 
 #+begin_src elisp :tangle ./doom-emacs/packages.el
 (package! org-drill)
+#+end_src
+
+In my workflow I tend to add flashcards in batches, this also means that flashcards to review will tend to comme in batches as well. To deal with this we add /noise/ to the scheduling, causing the review dates to /spread out/. This is a common technique and org-drill has a setting for enabling this feature:
+
+#+begin_src elisp :tangle ./doom-emacs/config.el
+(setq org-drill-add-random-noise-to-intervals-p t)
 #+end_src
 ** Zettelkasten-method with =org-roam v2=.
 We install this by manually adding the ~+roam2~ flag to the ~org~ module in ~init.el~.
@@ -830,7 +846,7 @@ Relevant sections:
 ** TODO [#C] Make =ditaa= code blocks work with =org-babel=.
 ** TODO [#C] Move ~./doom-emacs/init.el~ into the literate config.
 ** PROJ [#C] Move all of the contents of [[file:emma/][./emma/]] into the literate config.
-** TODO [#B] Configure doom-emacs so that everything doesn't have to be rebuilt everytime
+** DONE [#B] Configure doom-emacs so that everything doesn't have to be rebuilt everytime
 See: https://github.com/nix-community/nix-doom-emacs/pull/303
 ** TODO Latexpreview sometimes fail
     See[[ ~/org/flashcards.org]] for example.
