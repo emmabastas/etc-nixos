@@ -48,11 +48,11 @@
   - [[#setup-home-folder-syncing-with-mega][Setup home folder syncing with Mega]]
   - [[#sometimes-only-the-first-time-when-opening-a-hyperlink-in-emacs-they-are-opened-as-two-tabs-in-ff--one-tab-in-chrome][Sometimes (only the first time?) when opening a hyperlink in emacs they are opened as two tabs in FF + one tab in Chrome.]]
   - [[#pomodoro-timer-in-emacs][Pomodoro timer in emacs]]
-  - [[#latexpreview-sometimes-fails][Latexpreview sometimes fails]]
   - [[#make-ditaa-code-blocks-work-with-org-babel][Make =ditaa= code blocks work with =org-babel=.]]
   - [[#move-doom-emacsinitel-into-the-literate-config][Move ~./doom-emacs/init.el~ into the literate config.]]
   - [[#proj-c-move-all-of-the-contents-of-emma-into-the-literate-config][PROJ [#C] Move all of the contents of ./emma/ into the literate config.]]
   - [[#configure-doom-emacs-so-that-everything-doesnt-have-to-be-rebuilt-everytime][Configure doom-emacs so that everything doesn't have to be rebuilt everytime]]
+  - [[#latexpreview-sometimes-fail][Latexpreview sometimes fail]]
 
 * How to use
 
@@ -827,9 +827,17 @@ Relevant sections:
     is ~org-file-apps~ the relevant variable?
 
 ** TODO [#C] Pomodoro timer in emacs
-** TODO [#C] [[file:~/org/flashcards.org::*Latexpreview sometimes fails][Latexpreview sometimes fails]]
 ** TODO [#C] Make =ditaa= code blocks work with =org-babel=.
 ** TODO [#C] Move ~./doom-emacs/init.el~ into the literate config.
 ** PROJ [#C] Move all of the contents of [[file:emma/][./emma/]] into the literate config.
 ** TODO [#B] Configure doom-emacs so that everything doesn't have to be rebuilt everytime
 See: https://github.com/nix-community/nix-doom-emacs/pull/303
+** TODO Latexpreview sometimes fail
+    See[[ ~/org/flashcards.org]] for example.
+
+    the ~#+STARTUP: latexpreview~ bit preserves all inline latex previews after the buffer is killed.
+    If the buffer is opened with late that isn't rendered there will be complains
+    that =latex= and =dvipng= can't be found, but when previewing a specific segment with
+    ~org-latex-preview~ then it works.
+
+    *QUICK FIX* Make sure everything is rendered with ~org-latex-preview~ b4 closing document.
