@@ -15,11 +15,10 @@
     - [[#todo-keywords][TODO-Keywords]]
     - [[#font-faces][Font faces]]
     - [[#which-programs-to-use-for-opening-org-links][Which programs to use for opening org links]]
-    - [[#spell-checking][Spell checking]]
-  - [[#misc][Misc]]
-    - [[#flash-cards-with-org-drill][Flash cards with =org-drill=.]]
-    - [[#zettelkasten-method-with-org-roam-v2][Zettelkasten-method with =org-roam v2=.]]
-    - [[#relative-line-numbering][Relative line numbering]]
+  - [[#spell-checking][Spell checking]]
+  - [[#flash-cards-with-org-drill][Flash cards with =org-drill=.]]
+  - [[#zettelkasten-method-with-org-roam-v2][Zettelkasten-method with =org-roam v2=.]]
+  - [[#relative-line-numbering][Relative line numbering]]
 - [[#desktop-environment][Desktop environment]]
 - [[#networking][Networking]]
   -  [[#managing-networkmanager-connections-delete-connections-see-passwords][Managing =NetworkManager= connections (delete connections, see passwords)]]
@@ -34,12 +33,13 @@
     - [[#touchpad][Touchpad]]
     - [[#boot][Boot]]
     - [[#result-of-nixos-generate-config][Result of ~nixos-generate-config~.]]
-- [[#misc-1][Misc]]
+- [[#misc][Misc]]
   - [[#use-x-server][Use X server:]]
   - [[#ssh][SSH]]
   - [[#state-version][State version]]
 - [[#mathematica][Mathematica]]
 - [[#global-todos][Global TODOS]]
+  - [[#find-a-relliable-way-to-override-default-doom-settings-for-packages][Find a relliable way to override default doom settings for packages]]
   - [[#should-i3-be-configured-in-nix-instead-of-in-a-separate-config-file][Should =i3= be configured in nix instead of in a separate config file?]]
   - [[#setup-home-folder-syncing-with-mega][Setup home folder syncing with Mega]]
   - [[#sometimes-only-the-first-time-when-opening-a-hyperlink-in-emacs-they-are-opened-as-two-tabs-in-ff--one-tab-in-chrome][Sometimes (only the first time?) when opening a hyperlink in emacs they are opened as two tabs in FF + one tab in Chrome.]]
@@ -390,7 +390,7 @@ Now we setup the font faces: (If you're in a org document and want to know the f
 
 For example opening web pages and pdf's with firefox should be configured in a firefox section.
 
-*** Spell checking
+** Spell checking
 This hasn't been configured successfully, the broken config that might be useful for a future atempt looks like this:
 
 ~config.el~
@@ -429,14 +429,13 @@ This hasn't been configured successfully, the broken config that might be useful
   '';
 }
 #+end_src
-** Misc
-*** Flash cards with =org-drill=.
+** Flash cards with =org-drill=.
 All we need to do is add the following to ~packages.el~
 
 #+begin_src elisp :tangle ./doom-emacs/packages.el
 (package! org-drill)
 #+end_src
-*** Zettelkasten-method with =org-roam v2=.
+** Zettelkasten-method with =org-roam v2=.
 We install this by manually adding the ~+roam2~ flag to the ~org~ module in ~init.el~.
 
 org-roam uses /graphviz/ to generate a graph from all of the notes. We install the program and make sure that emacs can find the binary:
@@ -452,7 +451,7 @@ org-roam uses /graphviz/ to generate a graph from all of the notes. We install t
 #+begin_src elisp
 (setq org-roam-graph-executable "${pkgs.graphviz.out}/bin/dot")
 #+end_src
-*** Relative line numbering
+** Relative line numbering
 #+begin_src elisp tangle: ./doom-emacs/config.el
 (setq display-line-numbers-type 'relative)
 #+end_src
@@ -775,6 +774,7 @@ After that we can install the nix package:
 
 
 * Global TODOS
+** TODO [#B] Find a relliable way to override default doom settings for packages
 ** TODO [#B] Should =i3= be configured in nix instead of in a separate config file?
 Relevant sections:
     - [[Screen brightness]]
