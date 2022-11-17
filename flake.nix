@@ -48,12 +48,21 @@
                     ];
                   }
                   {
+                    programs.doom-emacs.enable = true;
+                    services.emacs.enable = true;
+                  }
+                  {
                     programs.doom-emacs.extraPackages = [ pkgs.graphviz ];
+                  }
+                  {
+                    home.packages = [ pkgs.ditaa ];
                   }
                   {
                     programs.doom-emacs = {
                       extraConfig = ''
                         (setq org-roam-graph-executable "${pkgs.graphviz.out}/bin/dot")
+                        ;(add-hook! 'org-babel-before-execute-hook
+                                   ;(lambda () (setq org-ditaa-jar-path "${pkgs.ditaa.out}/lib/ditaa.jar")))
                       '';
                     };
                   }

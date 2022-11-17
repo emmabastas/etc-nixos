@@ -19,6 +19,10 @@
   - [[#flash-cards-with-org-drill][Flash cards with =org-drill=.]]
   - [[#zettelkasten-method-with-org-roam-v2][Zettelkasten-method with =org-roam v2=.]]
   - [[#relative-line-numbering][Relative line numbering]]
+  - [[#render-ascii-diagrams-with-ditaa][Render ASCII diagrams with =ditaa=]]
+    - [[#how-wed-like-to-do-it-but-doesnt-work][How we'd like to do it (but doesn't work)]]
+    - [[#workarond][Workarond]]
+    - [[#make-ditaa-work-in-emacs-the-way-we-want-to-remove-need-for-workaround][Make ditaa work in Emacs the way we want to, remove need for workaround.]]
 - [[#desktop-environment][Desktop environment]]
 - [[#networking][Networking]]
   -  [[#managing-networkmanager-connections-delete-connections-see-passwords][Managing =NetworkManager= connections (delete connections, see passwords)]]
@@ -48,6 +52,7 @@
   - [[#make-ditaa-code-blocks-work-with-org-babel][Make =ditaa= code blocks work with =org-babel=.]]
   - [[#move-doom-emacsinitel-into-the-literate-config][Move ~./doom-emacs/init.el~ into the literate config.]]
   - [[#proj-c-move-all-of-the-contents-of-emma-into-the-literate-config][PROJ [#C] Move all of the contents of ./emma/ into the literate config.]]
+  - [[#configure-doom-emacs-so-that-everything-doesnt-have-to-be-rebuilt-everytime][Configure doom-emacs so that everything doesn't have to be rebuilt everytime]]
 
 * How to use
 
@@ -116,10 +121,12 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
                   <<users-emma-emacs-2>>
                   <<users-emma-emacs-3>>
                   <<users-emma-emacs-zettelkasten>>
+                  <<users-emma-emacs-ditaa>>
                   {
                     programs.doom-emacs = {
                       extraConfig = ''
                         <<users-emma-emacs-extra-config-zettelkasten>>
+                        <<users-emma-emacs-extra-config-ditaa>>
                       '';
                     };
                   }
@@ -456,6 +463,41 @@ org-roam uses /graphviz/ to generate a graph from all of the notes. We install t
 (setq display-line-numbers-type 'relative)
 #+end_src
 
+** Render ASCII diagrams with =ditaa=
+
+Ditaa is a diagram markup language with very loose syntax. We sometimes want to use it in ~.org~ documents with ~org-babel~ to render diagrams.
+
+*** How we'd like to do it (but doesn't work)
+We install ditaa and make sure emacs can find it:
+
+##+name: users-emma-emacs-ditaa
+#+begin_src nix
+{
+  programs.doom-emacs.extraPackages = [ pkgs.ditaa ];
+}
+#+end_src
+
+We would like to do sometthing like the following for emacs to find ditaa. But it seams this always gets overwritten....
+
+#+name: users-emma-emacs-extra-config-ditaa
+#+begin_src elisp
+;(add-hook! 'org-babel-before-execute-hook
+           ;(lambda () (setq org-ditaa-jar-path "${pkgs.ditaa.out}/lib/ditaa.jar")))
+#+end_src
+
+*** Workarond
+Install ditaa globaly
+
+#+name:users-emma-emacs-ditaa
+#+begin_src nix
+{
+  home.packages = [ pkgs.ditaa ];
+}
+#+end_src
+
+*** TODO [#C] Make ditaa work in Emacs the way we want to, remove need for workaround.
+Related to:[[*Find a relliable way to override default doom settings for packages][ Find a relliable way to override default doom settings for packages]]
+
 * Desktop environment
 
 Use =i3= as the window manager:
@@ -789,3 +831,5 @@ Relevant sections:
 ** TODO [#C] Make =ditaa= code blocks work with =org-babel=.
 ** TODO [#C] Move ~./doom-emacs/init.el~ into the literate config.
 ** PROJ [#C] Move all of the contents of [[file:emma/][./emma/]] into the literate config.
+** TODO [#B] Configure doom-emacs so that everything doesn't have to be rebuilt everytime
+See: https://github.com/nix-community/nix-doom-emacs/pull/303
