@@ -30,6 +30,7 @@
 - [[#other-packages][Other packages]]
   - [[#vim][Vim]]
   - [[#teamviewer][Teamviewer]]
+  - [[#mathematica][Mathematica]]
 - [[#machine-specific-configuration][Machine specific configuration]]
     - [[#high-res-screen][High-res screen]]
     - [[#screen-brightness][Screen brightness]]
@@ -41,7 +42,6 @@
   - [[#use-x-server][Use X server:]]
   - [[#ssh][SSH]]
   - [[#state-version][State version]]
-- [[#mathematica][Mathematica]]
 - [[#global-todos][Global TODOS]]
   - [[#find-a-relliable-way-to-override-default-doom-settings-for-packages][Find a relliable way to override default doom settings for packages]]
   - [[#should-i3-be-configured-in-nix-instead-of-in-a-separate-config-file][Should =i3= be configured in nix instead of in a separate config file?]]
@@ -585,7 +585,6 @@ Connections are stored in [[/etc/NetworkManager/system-connections/]] (requires 
 #+end_src
 
 * Other packages
-
 ** Vim
 
 #+name: system-wide-vim
@@ -608,6 +607,24 @@ We sometimes want to use Teamviewer to help friends and family with IT. Teamview
 #+end_src
 
 We could proably find a better way to disable teamviewer by default, but this is 80/20.
+
+** Mathematica
+Mathematica is proprietary software, and the nix package requires ~Mathematica_13.0.1_BNDL_LINUX.sh~ to already be a part of the store.
+The file can be downoaded by going to [[https://account.wolfram.com/products]] ~> User Portal~ and doing a =Drect File Download=.
+
+Then add the downloaded file to the store with ~nix-store --add-fixed sha256 Mathematica_13.0.1_BNDL_LINUX.sh~.
+
+Check if the file in in the store with ~ls /nix/store/ | grep Mathematica~.
+
+After that we can install the nix package:
+
+#+name: system-wide-mathematica
+#+begin_src nix
+{
+  nixpkgs.config.allowUnfree = true;
+  environment.systemPackages = [ pkgs.mathematica ];
+}
+#+end_src
 
 * Machine specific configuration
 
@@ -809,24 +826,6 @@ nixos-generate-config --show-hardware-config 2>&1
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "21.11"; # Did you read the comment?
-}
-#+end_src
-
-* Mathematica
-Mathematica is proprietary software, and the nix package requires ~Mathematica_13.0.1_BNDL_LINUX.sh~ to already be a part of the store.
-The file can be downoaded by going to [[https://account.wolfram.com/products]] ~> User Portal~ and doing a =Drect File Download=.
-
-Then add the downloaded file to the store with ~nix-store --add-fixed sha256 Mathematica_13.0.1_BNDL_LINUX.sh~.
-
-Check if the file in in the store with ~ls /nix/store/ | grep Mathematica~.
-
-After that we can install the nix package:
-
-#+name: system-wide-mathematica
-#+begin_src nix
-{
-  nixpkgs.config.allowUnfree = true;
-  environment.systemPackages = [ pkgs.mathematica ];
 }
 #+end_src
 
