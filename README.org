@@ -5,6 +5,7 @@
   - [[#tangle][Tangle.]]
   - [[#make-sure-relevant-files-are-checking-into-version-control][Make sure relevant files are checking into version control]]
   - [[#apply-the-config-with-dry-activate--test--switch][Apply the config with ~dry-activate~ / ~test~ / ~switch~.]]
+- [[#nix-environment-for-this-config][Nix environment for this config]]
 - [[#root-config][Root config]]
   - [[#utility-functions][Utility functions]]
 - [[#emacs][Emacs]]
@@ -71,6 +72,38 @@ When running a nix flake unstaged files are ignored (see[[https://github.com/Nix
 ** Apply the config with ~dry-activate~ / ~test~ / ~switch~.
 
 ~nixos-rebuild <dry-activate | test | switch> --flake .~
+
+* Nix environment for this config
+To tangle this config and interactively run some of the non shell and elsip code-blocks we want to setup a nix environment.
+
+We use a nix flake for the environment. If we depend on some program to run code blocks in this config the dependencies can be added here.
+
+#+begin_src nix :noweb yes :tangle ./dev-flake/flake.nix
+{
+  description = "Flake to use when working on the literate config";
+
+  inputs.flake-utils.url = "github:numtide/flake-utils";
+
+  outputs = { self, nixpkgs, flake-utils }:
+    flake-utils.lib.eachDefaultSystem
+      (system:
+        let pkgs = nixpkgs.legacyPackages.${system}; in
+        {
+          devShells.default = pkgs.mkShell {
+            packages = [];
+          };
+        }
+      );
+}
+#+end_src
+
+and also enable direv:
+
+#+begin_src envrc :tangle ./.envrc
+use flake ./dev-flake
+#+end_src
+
+Direnv expects the flake to be named ~flake.nix~ which conflicts with the name of our system configuration flake. Hence putting this flake in a subdirectory. We could use a non standard name but it would require us to make some changes in the flake itself annd that's a hassle I won't bother dealing with.
 
 * Root config
 
