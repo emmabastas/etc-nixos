@@ -32,6 +32,8 @@
   - [[#vim][Vim]]
   - [[#teamviewer][Teamviewer]]
   - [[#mathematica][Mathematica]]
+- [[#backups-with-meganz][Backups with mega.nz]]
+  - [[#daily-backups][Daily backups]]
 - [[#machine-specific-configuration][Machine specific configuration]]
     - [[#high-res-screen][High-res screen]]
     - [[#screen-brightness][Screen brightness]]
@@ -158,6 +160,7 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
                   <<users-emma-emacs-2>>
                   <<users-emma-emacs-zettelkasten>>
                   <<users-emma-emacs-ditaa>>
+                  <<users-emma-mega-cmd>>
                   {
                     programs.doom-emacs = {
                       extraConfig = ''
@@ -663,6 +666,39 @@ After that we can install the nix package:
 }
 #+end_src
 
+* Backups with mega.nz
+/NOTE: All of the setup here is statefull, not done automatically by nix./
+
+We use[[https://mega.nz/cmd][ mega-cmd]] to backup some files in the home directory.
+
+install mega-cmd:
+
+#+name: users-emma-mega-cmd
+#+begin_src nix
+{
+  programs.doom-emacs.extraPackages = [ pkgs.megacmd ];
+}
+#+end_src
+
+Based off [[https://github.com/meganz/MEGAcmd/blob/master/contrib/docs/BACKUPS.md][this guide]]
+
+First we need to login:
+#+begin_src bash
+mega-login <email> <password>
+#+end_src
+
+** Daily backups
+
+Create the backup directory on the cloud if it doesn't exists.
+Then we sync ~~/org~ every day at 10:00 and keep 10 backups.
+
+#+begin_src
+# Create backup directory if it doesn't exists
+mega-mkdir -p /backups/samsung_940x/daily/
+
+mega-backup /home/emma/org/ /backups/samsung_940x/daily/ --period="0 0 10 * * *" --num-backups=10
+#+end_src
+
 * Machine specific configuration
 
 I'm currently running my config on a single machine, so no need to split up this part of the config depending on machine yet.
@@ -1118,7 +1154,7 @@ Relevant sections:
     - [[Screen brightness]]
     - [[Sound]]
 
-** TODO [#A] Setup home folder syncing with Mega
+** DONE [#A] Setup home folder syncing with Mega
 ** TODO [#C] Sometimes (only the first time?) when opening a hyperlink in emacs they are opened as two tabs in FF + one tab in Chrome.
     is ~org-file-apps~ the relevant variable?
 

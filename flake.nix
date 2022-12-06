@@ -68,6 +68,9 @@
                     home.packages = [ pkgs.ditaa ];
                   }
                   {
+                    programs.doom-emacs.extraPackages = [ pkgs.megacmd ];
+                  }
+                  {
                     programs.doom-emacs = {
                       extraConfig = ''
                         (setq org-roam-graph-executable "${pkgs.graphviz.out}/bin/dot")

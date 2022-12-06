@@ -33,7 +33,6 @@ in
     vim
     direnv
     firefox
-    pkgs.megacmd
     pkgs.signal-desktop
     pkgs.feh
     pkgs.gimp
