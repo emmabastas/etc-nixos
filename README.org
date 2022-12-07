@@ -526,7 +526,7 @@ Ditaa is a diagram markup language with very loose syntax. We sometimes want to 
 *** How we'd like to do it (but doesn't work)
 We install ditaa and make sure emacs can find it:
 
-##+name: users-emma-emacs-ditaa
+#+name: users-emma-emacs-ditaa
 #+begin_src nix
 {
   programs.doom-emacs.extraPackages = [ pkgs.ditaa ];
