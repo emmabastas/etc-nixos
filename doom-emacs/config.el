@@ -65,3 +65,17 @@
           ("\\.pdf\\'" . "firefox %s"))))
 
 (setq org-drill-add-random-noise-to-intervals-p t)
+
+(defvar nterms 0)
+
+(defun term_ (program)
+  "Modified version of ~term~"
+  (interactive (list "/run/current-system/sw/bin/bash"))
+  (setq nterms (+ 1 nterms))
+  (let ((termname (concat "terminal-" (number-to-string nterms))))
+      (set-buffer (make-term termname program))
+      (term-mode)
+      (term-char-mode)
+      (switch-to-buffer (concat "*" termname "*"))))
+
+(define-key (current-global-map) (kbd "C-c t") #'term_)

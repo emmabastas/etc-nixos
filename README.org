@@ -24,6 +24,7 @@
     - [[#how-wed-like-to-do-it-but-doesnt-work][How we'd like to do it (but doesn't work)]]
     - [[#workarond][Workarond]]
     - [[#make-ditaa-work-in-emacs-the-way-we-want-to-remove-need-for-workaround][Make ditaa work in Emacs the way we want to, remove need for workaround.]]
+  - [[#terminal-emulator][Terminal emulator]]
 - [[#desktop-environment][Desktop environment]]
 - [[#networking][Networking]]
   -  [[#managing-networkmanager-connections-delete-connections-see-passwords][Managing =NetworkManager= connections (delete connections, see passwords)]]
@@ -553,6 +554,31 @@ Install ditaa globaly
 
 *** TODO [#C] Make ditaa work in Emacs the way we want to, remove need for workaround.
 Related to:[[*Find a relliable way to override default doom settings for packages][ Find a relliable way to override default doom settings for packages]]
+
+** Terminal emulator
+We're using ~shell~ (see ~init.el~) for our terminal needs.
+
+We bind ~C-c t~ to launching a new terminal with ~term_~.
+
+The ~term_~ function is based off of ~term~ but with two changes:
+1) In interactive mode we don't prompt for the shell program to run, we just run bash
+2) Each ~term_~ invocation creates a new terminal buffer, the behaviour is ~term~ is to create a single buffer or switch to it if it exists.
+
+#+begin_src elisp :tangle ./doom-emacs/config.el
+(defvar nterms 0)
+
+(defun term_ (program)
+  "Modified version of ~term~"
+  (interactive (list "/run/current-system/sw/bin/bash"))
+  (setq nterms (+ 1 nterms))
+  (let ((termname (concat "terminal-" (number-to-string nterms))))
+      (set-buffer (make-term termname program))
+      (term-mode)
+      (term-char-mode)
+      (switch-to-buffer (concat "*" termname "*"))))
+
+(define-key (current-global-map) (kbd "C-c t") #'term_)
+#+end_src
 
 * Desktop environment
 
