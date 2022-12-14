@@ -25,6 +25,7 @@
     - [[#workarond][Workarond]]
     - [[#make-ditaa-work-in-emacs-the-way-we-want-to-remove-need-for-workaround][Make ditaa work in Emacs the way we want to, remove need for workaround.]]
   - [[#terminal-emulator][Terminal emulator]]
+  - [[#insert-emojis][Insert emojis]]
 - [[#desktop-environment][Desktop environment]]
 - [[#networking][Networking]]
   -  [[#managing-networkmanager-connections-delete-connections-see-passwords][Managing =NetworkManager= connections (delete connections, see passwords)]]
@@ -579,6 +580,20 @@ The ~term_~ function is based off of ~term~ but with two changes:
 
 (define-key (current-global-map) (kbd "C-c t") #'term_)
 #+end_src
+
+** Insert emojis
+We enable emojify in ~init.el~ by adding the ~(emoji +unicode)~ snippet.
+
+If we would like to render ascii or github-style emojis (like :smile) we'd add ~+ascii~ and ~+github~ respectively.
+
+By default emojis are rendered as images, but our font has good unicode support so we'd like to display unicode glyphs as is:
+
+#+begin_src elisp :tangle ./doom-emacs/config.el
+(setq emojify-display-style 'unicode)
+#+end_src
+
+#+RESULTS:
+: unicode
 
 * Desktop environment
 

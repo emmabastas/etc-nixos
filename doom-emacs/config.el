@@ -79,3 +79,5 @@
       (switch-to-buffer (concat "*" termname "*"))))
 
 (define-key (current-global-map) (kbd "C-c t") #'term_)
+
+(setq emojify-display-style 'unicode)
