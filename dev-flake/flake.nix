@@ -10,10 +10,6 @@
         {
           devShells.default = pkgs.mkShell {
             packages = [
-              (pkgs.python3.withPackages (ps: with ps; [
-                matplotlib
-                numpy
-              ]))
             ];
           };
         }
