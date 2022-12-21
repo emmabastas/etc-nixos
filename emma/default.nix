@@ -31,9 +31,6 @@ in
     vim
     direnv
     firefox
-    pkgs.signal-desktop
-    pkgs.feh
-    pkgs.gimp
     (pkgs.nerdfonts.override { fonts = [ "FiraCode" ]; })
   ];
   programs = {

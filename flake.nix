@@ -71,6 +71,15 @@
                     home.packages = [ pkgs.megacmd ];
                   }
                   {
+                    home.packages = [ pkgs.gimp ];
+                  }
+                  {
+                    home.packages = [ pkgs.feh ];
+                  }
+                  {
+                    home.packages = [ pkgs.signal-desktop ];
+                  }
+                  {
                     programs.doom-emacs = {
                       extraConfig = ''
                         (setq org-roam-graph-executable "${pkgs.graphviz.out}/bin/dot")
