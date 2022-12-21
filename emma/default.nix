@@ -11,8 +11,6 @@ let
 
   firefox = pkgs.firefox;
 
-  chromium = pkgs.chromium;
-
   shellScript = cmd: {
     text = ''
       #!/bin/sh
@@ -81,7 +79,6 @@ in
     "bin/emacs" = applicationScript "emacsclient -cn $@";
     "bin/emacs-debug" = shellScript "emacs-28.1 -l /etc/nixos/emma/doom-emacs/config.el $@";
     "bin/firefox" = applicationScript "${firefox}/bin/firefox $@";
-    "bin/chromium" = applicationScript "${chromium}/bin/chromium $@";
   };
   fonts.fontconfig.enable = true;
 }
