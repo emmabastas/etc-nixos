@@ -715,7 +715,7 @@ install mega-cmd:
 #+name: users-emma-mega-cmd
 #+begin_src nix
 {
-  programs.doom-emacs.extraPackages = [ pkgs.megacmd ];
+  home.packages = [ pkgs.megacmd ];
 }
 #+end_src
 

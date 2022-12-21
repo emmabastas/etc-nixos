@@ -68,7 +68,7 @@
                     programs.doom-emacs.extraPackages = [ pkgs.ditaa ];
                   }
                   {
-                    programs.doom-emacs.extraPackages = [ pkgs.megacmd ];
+                    home.packages = [ pkgs.megacmd ];
                   }
                   {
                     programs.doom-emacs = {
