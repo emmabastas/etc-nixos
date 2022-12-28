@@ -81,3 +81,11 @@
 (define-key (current-global-map) (kbd "C-c t") #'term_)
 
 (setq emojify-display-style 'unicode)
+
+(setq emojify-user-emojis '(("—" . (("name" . "Em Dash")
+                                     ("unicode" . "—")
+                                     ("style" . "unicode")))))
+
+;; If emojify is already loaded refresh emoji data
+(when (featurep 'emojify)
+  (emojify-set-emoji-data))

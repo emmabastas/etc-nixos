@@ -26,6 +26,7 @@
     - [[#make-ditaa-work-in-emacs-the-way-we-want-to-remove-need-for-workaround][Make ditaa work in Emacs the way we want to, remove need for workaround.]]
   - [[#terminal-emulator][Terminal emulator]]
   - [[#insert-emojis][Insert emojis]]
+  - [[#custom-unicodeemoji-insertion][Custom unicode/emoji insertion]]
 - [[#desktop-environment][Desktop environment]]
 - [[#networking][Networking]]
   -  [[#managing-networkmanager-connections-delete-connections-see-passwords][Managing =NetworkManager= connections (delete connections, see passwords)]]
@@ -588,6 +589,9 @@ The ~term_~ function is based off of ~term~ but with two changes:
 #+end_src
 
 ** Insert emojis
+:PROPERTIES:
+:ID:       88c7c91a-e4d1-4130-8556-68418df4e65b
+:END:
 We enable emojify in ~init.el~ by adding the ~(emoji +unicode)~ snippet.
 
 If we would like to render ascii or github-style emojis (like :smile) we'd add ~+ascii~ and ~+github~ respectively.
@@ -600,6 +604,21 @@ By default emojis are rendered as images, but our font has good unicode support 
 
 #+RESULTS:
 : unicode
+
+** Custom unicode/emoji insertion
+We use =emojify= (see [[*Insert emojis][Insert emojis]]) to insert emoji, we can also use this to easilly insert any kind of unicode characters we may want:
+
+#+begin_src elisp :tangle ./doom-emacs/config.el
+(setq emojify-user-emojis '(("—" . (("name" . "Em Dash")
+                                     ("unicode" . "—")
+                                     ("style" . "unicode")))))
+
+;; If emojify is already loaded refresh emoji data
+(when (featurep 'emojify)
+  (emojify-set-emoji-data))
+#+end_src
+
+See https://github.com/iqbalansari/emacs-emojify#custom-emojis for further reading.
 
 * Desktop environment
 
