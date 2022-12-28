@@ -80,6 +80,9 @@
                     home.packages = [ pkgs.signal-desktop ];
                   }
                   {
+                    home.packages = [ pkgs.tealdeer ];
+                  }
+                  {
                     programs.doom-emacs = {
                       extraConfig = ''
                         (setq org-roam-graph-executable "${pkgs.graphviz.out}/bin/dot")

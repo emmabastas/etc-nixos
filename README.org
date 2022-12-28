@@ -37,6 +37,7 @@
   - [[#gimp][Gimp]]
   - [[#feh][Feh]]
   - [[#signal][Signal]]
+  - [[#tldr][Tldr]]
 - [[#backups-with-meganz][Backups with mega.nz]]
 - [[#firefox][Firefox]]
   - [[#wip-custom-firefox-homepage][WIP Custom firefox homepage]]
@@ -167,6 +168,7 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
                   <<users-emma-gimp>>
                   <<users-emma-feh>>
                   <<users-emma-signal-desktop>>
+                  <<users-emma-tldr>>
                   {
                     programs.doom-emacs = {
                       extraConfig = ''
@@ -732,6 +734,16 @@ After that we can install the nix package:
   home.packages = [ pkgs.signal-desktop ];
 }
 #+end_src
+
+** Tldr
+Tealdr is a rust implementation of tldr
+#+name: users-emma-tldr
+#+begin_src nix
+{
+  home.packages = [ pkgs.tealdeer ];
+}
+#+end_src
+
 * Backups with mega.nz
 /NOTE: All of the setup here is statefull, not done automatically by nix./
 
