@@ -64,8 +64,6 @@
           ("\\.x?html?\\'" . default)
           ("\\.pdf\\'" . "firefox %s"))))
 
-(setq org-drill-add-random-noise-to-intervals-p t)
-
 (defvar nterms 0)
 
 (defun term_ (program)
@@ -89,3 +87,5 @@
 ;; If emojify is already loaded refresh emoji data
 (when (featurep 'emojify)
   (emojify-set-emoji-data))
+
+(setq org-drill-add-random-noise-to-intervals-p t)

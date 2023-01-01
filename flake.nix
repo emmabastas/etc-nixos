@@ -83,6 +83,9 @@
                     home.packages = [ pkgs.tealdeer ];
                   }
                   {
+                    home.packages = [ (pkgs.callPackage ./webwork-flashcard {}) ];
+                  }
+                  {
                     programs.doom-emacs = {
                       extraConfig = ''
                         (setq org-roam-graph-executable "${pkgs.graphviz.out}/bin/dot")

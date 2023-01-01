@@ -17,7 +17,6 @@
     - [[#font-faces][Font faces]]
     - [[#which-programs-to-use-for-opening-org-links][Which programs to use for opening org links]]
   - [[#spell-checking][Spell checking]]
-  - [[#flash-cards-with-org-drill][Flash cards with =org-drill=.]]
   - [[#zettelkasten-method-with-org-roam-v2][Zettelkasten-method with =org-roam v2=.]]
   - [[#relative-line-numbering][Relative line numbering]]
   - [[#render-ascii-diagrams-with-ditaa][Render ASCII diagrams with =ditaa=]]
@@ -27,6 +26,9 @@
   - [[#terminal-emulator][Terminal emulator]]
   - [[#insert-emojis][Insert emojis]]
   - [[#custom-unicodeemoji-insertion][Custom unicode/emoji insertion]]
+- [[#flashcards-setup][Flashcards setup]]
+  - [[#org-drill][=org-drill=]]
+  - [[#webwork-flashcard][=webwork-flashcard=]]
 - [[#desktop-environment][Desktop environment]]
 - [[#networking][Networking]]
   -  [[#managing-networkmanager-connections-delete-connections-see-passwords][Managing =NetworkManager= connections (delete connections, see passwords)]]
@@ -170,6 +172,7 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
                   <<users-emma-feh>>
                   <<users-emma-signal-desktop>>
                   <<users-emma-tldr>>
+                  <<users-emma-webwork-flashcard>>
                   {
                     programs.doom-emacs = {
                       extraConfig = ''
@@ -495,18 +498,6 @@ This hasn't been configured successfully, the broken config that might be useful
   '';
 }
 #+end_src
-** Flash cards with =org-drill=.
-We install org-drill via ~packages.el~:
-
-#+begin_src elisp :tangle ./doom-emacs/packages.el
-(package! org-drill)
-#+end_src
-
-In my workflow I tend to add flashcards in batches, this also means that flashcards to review will tend to comme in batches as well. To deal with this we add /noise/ to the scheduling, causing the review dates to /spread out/. This is a common technique and org-drill has a setting for enabling this feature:
-
-#+begin_src elisp :tangle ./doom-emacs/config.el
-(setq org-drill-add-random-noise-to-intervals-p t)
-#+end_src
 ** Zettelkasten-method with =org-roam v2=.
 We install this by manually adding the ~+roam2~ flag to the ~org~ module in ~init.el~.
 
@@ -617,9 +608,33 @@ We use =emojify= (see [[*Insert emojis][Insert emojis]]) to insert emoji, we can
 (when (featurep 'emojify)
   (emojify-set-emoji-data))
 #+end_src
+#+RESULTS:
 
 See https://github.com/iqbalansari/emacs-emojify#custom-emojis for further reading.
 
+* Flashcards setup
+** =org-drill=
+We install org-drill via ~packages.el~:
+
+#+begin_src elisp :tangle ./doom-emacs/packages.el
+(package! org-drill)
+#+end_src
+
+In my workflow I tend to add flashcards in batches, this also means that flashcards to review will tend to comme in batches as well. To deal with this we add /noise/ to the scheduling, causing the review dates to /spread out/. This is a common technique and org-drill has a setting for enabling this feature:
+
+#+begin_src elisp :tangle ./doom-emacs/config.el
+(setq org-drill-add-random-noise-to-intervals-p t)
+#+end_src
+
+** =webwork-flashcard=
+I've made a custom webserver for integrating webwork problems with my flashcard setup. Read more about it here: https://github.com/emmabastas/webwork-flashcard
+
+#+name: users-emma-webwork-flashcard
+#+begin_src nix
+{
+  home.packages = [ (pkgs.callPackage ./webwork-flashcard {}) ];
+}
+#+end_src
 * Desktop environment
 
 Use =i3= as the window manager:
