@@ -626,6 +626,12 @@ In my workflow I tend to add flashcards in batches, this also means that flashca
 (setq org-drill-add-random-noise-to-intervals-p t)
 #+end_src
 
+By default org-drill prompts us to save the file when done with the drill session. Saving is in my muscle-memory and I only find this anoying so let's dissable it:
+
+#+begin_src elisp :tangle ./doom-emacs/config.el
+(setq org-drill-save-buffers-after-drill-sessions-p nil)
+#+end_src
+
 ** =webwork-flashcard=
 I've made a custom webserver for integrating webwork problems with my flashcard setup. Read more about it here: https://github.com/emmabastas/webwork-flashcard
 

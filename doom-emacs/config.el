@@ -89,3 +89,5 @@
   (emojify-set-emoji-data))
 
 (setq org-drill-add-random-noise-to-intervals-p t)
+
+(setq org-drill-save-buffers-after-drill-sessions-p nil)
