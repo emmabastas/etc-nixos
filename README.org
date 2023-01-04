@@ -73,11 +73,14 @@
 
 ** Tangle.
 #+begin_src elisp :noweb yes
+; Before tangling we need to make =html= code blocks executable by babel so that we can tagnle them
+(defun org-babel-execute:html (body params) body)
+
 (org-babel-tangle)
 #+end_src
 
 #+RESULTS:
-| flake.nix |
+| ./firefox-homepage.html | ./doom-emacs/packages.el | ./doom-emacs/config.el | utils.nix | flake.nix | ./.envrc | ./dev-flake/flake.nix |
 
 ** Make sure relevant files are checking into version control
 
@@ -836,10 +839,6 @@ mega-backup /home/emma/org/ /backups/samsung_940x/daily/ --period="0 0 10 * * *"
 
 * Firefox
 ** WIP Custom firefox homepage
-#+begin_src emacs-lisp :results none
-  (defun org-babel-execute:html (body params) body)
-#+end_src
-
 #+begin_src html :noweb yes :tangle ./firefox-homepage.html :results none
 <!DOCTYPE html>
 <html>
@@ -1207,7 +1206,7 @@ nixos-generate-config --show-hardware-config 2>&1
 
 
 * Global TODOS
-** TODO [#B] Make it so that I don't have to manually tun that code block in Firefox section in order to tangle this file
+** DONE [#B] Make it so that I don't have to manually tun that code block in Firefox section in order to tangle this file
 ** TODO [#B] Find a relliable way to override default doom settings for packages
 ** TODO [#B] Should =i3= be configured in nix instead of in a separate config file?
 Relevant sections:
