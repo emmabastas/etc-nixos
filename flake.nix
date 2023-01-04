@@ -86,6 +86,13 @@
                     home.packages = [ (pkgs.callPackage ./webwork-flashcard {}) ];
                   }
                   {
+                    home.packages = [
+                      pkgs.python38
+                      pkgs.ghc
+                      pkgs.haskell-language-server
+                    ];
+                  }
+                  {
                     programs.doom-emacs = {
                       extraConfig = ''
                         (setq org-roam-graph-executable "${pkgs.graphviz.out}/bin/dot")

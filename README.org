@@ -26,6 +26,7 @@
   - [[#terminal-emulator][Terminal emulator]]
   - [[#insert-emojis][Insert emojis]]
   - [[#custom-unicodeemoji-insertion][Custom unicode/emoji insertion]]
+- [[#globally-installed-programming-language][Globally installed programming language]]
 - [[#flashcards-setup][Flashcards setup]]
   - [[#org-drill][=org-drill=]]
   - [[#webwork-flashcard][=webwork-flashcard=]]
@@ -173,6 +174,7 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
                   <<users-emma-signal-desktop>>
                   <<users-emma-tldr>>
                   <<users-emma-webwork-flashcard>>
+                  <<users-emma-global-pls>>
                   {
                     programs.doom-emacs = {
                       extraConfig = ''
@@ -611,6 +613,22 @@ We use =emojify= (see [[*Insert emojis][Insert emojis]]) to insert emoji, we can
 #+RESULTS:
 
 See https://github.com/iqbalansari/emacs-emojify#custom-emojis for further reading.
+
+* Globally installed programming language
+Some languages we find ourselves using quite a lot for simple scripting and we want to install them globally to save ourselves from a bunch of ~shell.nix~'s all over the place.
+
+#+name: users-emma-global-pls
+#+begin_src nix
+{
+  home.packages = [
+    pkgs.python38
+    pkgs.ghc
+    pkgs.haskell-language-server
+  ];
+}
+#+end_src
+
+In addition to this we add the ~python~ and ~haskell~ module to ~init.el~
 
 * Flashcards setup
 ** =org-drill=
