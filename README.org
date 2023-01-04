@@ -57,6 +57,7 @@
   - [[#ssh][SSH]]
   - [[#state-version][State version]]
 - [[#global-todos][Global TODOS]]
+  - [[#make-it-so-that-i-dont-have-to-manually-tun-that-code-block-in-firefox-section-in-order-to-tangle-this-file][Make it so that I don't have to manually tun that code block in Firefox section in order to tangle this file]]
   - [[#find-a-relliable-way-to-override-default-doom-settings-for-packages][Find a relliable way to override default doom settings for packages]]
   - [[#should-i3-be-configured-in-nix-instead-of-in-a-separate-config-file][Should =i3= be configured in nix instead of in a separate config file?]]
   - [[#setup-home-folder-syncing-with-mega][Setup home folder syncing with Mega]]
@@ -1206,6 +1207,7 @@ nixos-generate-config --show-hardware-config 2>&1
 
 
 * Global TODOS
+** TODO [#B] Make it so that I don't have to manually tun that code block in Firefox section in order to tangle this file
 ** TODO [#B] Find a relliable way to override default doom settings for packages
 ** TODO [#B] Should =i3= be configured in nix instead of in a separate config file?
 Relevant sections:
