@@ -18,6 +18,7 @@
     - [[#which-programs-to-use-for-opening-org-links][Which programs to use for opening org links]]
   - [[#spell-checking][Spell checking]]
   - [[#zettelkasten-method-with-org-roam-v2][Zettelkasten-method with =org-roam v2=.]]
+    - [[#org-roam-ui][=org-roam-ui=]]
   - [[#relative-line-numbering][Relative line numbering]]
   - [[#render-ascii-diagrams-with-ditaa][Render ASCII diagrams with =ditaa=]]
     - [[#how-wed-like-to-do-it-but-doesnt-work][How we'd like to do it (but doesn't work)]]
@@ -520,6 +521,35 @@ org-roam uses /graphviz/ to generate a graph from all of the notes. We install t
 #+begin_src elisp
 (setq org-roam-graph-executable "${pkgs.graphviz.out}/bin/dot")
 #+end_src
+
+*** =org-roam-ui=
+From https://github.com/org-roam/org-roam-ui#doom
+#+begin_quote
+Org-roam-ui tries to keep up with the latest features of org-roam, which conflicts with Doom Emacs's desire for stability. To make sure nothing breaks, use the latest version of org-roam by unpinning it.
+#+end_quote
+
+#+begin_src elisp :tangle ./doom-emacs/packages.el
+(unpin! org-roam)
+(package! org-roam-ui)
+#+end_src
+
+#+begin_src elisp :tangle ./doom-emacs/config.el
+(use-package! websocket
+    :after org-roam)
+
+(use-package! org-roam-ui
+    :after org-roam ;; or :after org
+;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+;;         a hookable mode anymore, you're advised to pick something yourself
+;;         if you don't care about startup time, use
+;;  :hook (after-init . org-roam-ui-mode)
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
+#+end_src
+
 ** Relative line numbering
 #+begin_src elisp tangle: ./doom-emacs/config.el
 (setq display-line-numbers-type 'relative)
