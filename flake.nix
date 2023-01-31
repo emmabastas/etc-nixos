@@ -65,7 +65,7 @@
                     programs.doom-emacs.extraPackages = [ pkgs.graphviz ];
                   }
                   {
-                    programs.doom-emacs.extraPackages = [ pkgs.ditaa ];
+                    home.packages = [ pkgs.ditaa ];
                   }
                   {
                     home.packages = [ pkgs.megacmd ];
@@ -97,7 +97,50 @@
                       extraConfig = ''
                         (setq org-roam-graph-executable "${pkgs.graphviz.out}/bin/dot")
                         ;(add-hook! 'org-babel-before-execute-hook
-                                   ;(lambda () (setq org-ditaa-jar-path "${pkgs.ditaa.out}/lib/ditaa.jar")))
+                                   ;(lambda () (setq org-ditaa-jar-pathhh "${pkgs.ditaa.out}/lib/ditaa.jar")))
+                        (setq org-ditaa-jar-path-1 "${pkgs.ditaa.out}/lib/ditaa.jar")
+                        (add-hook! 'org-babel-after-execute-hook
+                          (setq org-ditaa-jar-path-2 "${pkgs.ditaa.out}/lib/ditaa.jar"))
+                        (add-hook! 'org-babel-after-execute-hook
+                          (after! ob-ditaa
+                            (setq org-ditaa-jar-path-3 "${pkgs.ditaa.out}/lib/ditaa.jar")))
+                        (after! ob-ditaa (setq org-ditaa-jar-path-4 "${pkgs.ditaa.out}/lib/ditaa.jar"))
+                        (after! ob-ditaa (setq org-ditaa-jar-path "${pkgs.ditaa.out}/lib/ditaa.jar"))
+                        
+                        (after! ob-ditaa (defun org-babel-execute:ditaa (body params)
+                          "Execute a block of Ditaa code with org-babel.
+                        This function is called by `org-babel-execute-src-block'."
+                          (let* ((ditaa-jar-path "${pkgs.ditaa.out}/bin/ditaa")
+                                 (out-file (or (cdr (assq :file params))
+                                             (error
+                                              "ditaa code block requires :file header argument")))
+                                 (cmdline (cdr (assq :cmdline params)))
+                                 (java (cdr (assq :java params)))
+                                 (in-file (org-babel-temp-file "ditaa-"))
+                                 (eps (cdr (assq :eps params)))
+                                 (eps-file (when eps (org-babel-process-file-name (concat in-file ".eps"))))
+                                 (pdf-cmd (when (and (or (string= (file-name-extension out-file) "pdf")
+                                                         (cdr (assq :pdf params))))
+                                            (concat
+                                             "epstopdf"
+                                             " " eps-file
+                                             " -o=" (org-babel-process-file-name out-file))))
+                                 (cmd (concat org-babel-ditaa-java-cmd
+                                              " " java " " org-ditaa-jar-option " "
+                                              (shell-quote-argument
+                                               (expand-file-name
+                                                (if eps org-ditaa-eps-jar-path ditaa-jar-path)))
+                                              " " cmdline
+                                              " " (org-babel-process-file-name in-file)
+                                              " " (if pdf-cmd
+                                                      eps-file
+                                                    (org-babel-process-file-name out-file)))))
+                            (unless (file-exists-p ditaa-jar-path)
+                            (error "Could not find ditaa.jar at %s" ditaa-jar-path))
+                            (with-temp-file in-file (insert body))
+                            (message cmd) (shell-command cmd)
+                            (when pdf-cmd (message pdf-cmd) (shell-command pdf-cmd))
+                            nil))) ;; signal that output has already been written to file
                       '';
                     };
                   }

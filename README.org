@@ -64,7 +64,6 @@
   - [[#setup-home-folder-syncing-with-mega][Setup home folder syncing with Mega]]
   - [[#sometimes-only-the-first-time-when-opening-a-hyperlink-in-emacs-they-are-opened-as-two-tabs-in-ff--one-tab-in-chrome][Sometimes (only the first time?) when opening a hyperlink in emacs they are opened as two tabs in FF + one tab in Chrome.]]
   - [[#pomodoro-timer-in-emacs][Pomodoro timer in emacs]]
-  - [[#make-ditaa-code-blocks-work-with-org-babel][Make =ditaa= code blocks work with =org-babel=.]]
   - [[#move-doom-emacsinitel-into-the-literate-config][Move ~./doom-emacs/init.el~ into the literate config.]]
   - [[#proj-c-move-all-of-the-contents-of-emma-into-the-literate-config][PROJ [#C] Move all of the contents of ./emma/ into the literate config.]]
   - [[#configure-doom-emacs-so-that-everything-doesnt-have-to-be-rebuilt-everytime][Configure doom-emacs so that everything doesn't have to be rebuilt everytime]]
@@ -560,9 +559,14 @@ Org-roam-ui tries to keep up with the latest features of org-roam, which conflic
 Ditaa is a diagram markup language with very loose syntax. We sometimes want to use it in ~.org~ documents with ~org-babel~ to render diagrams.
 
 *** How we'd like to do it (but doesn't work)
+#+begin_quote
+Unfortunately what's described in this section doesn't work for whatever reason.
+There's a workaround in the next secition that's used instead.
+#+end_quote
+
 We install ditaa and make sure emacs can find it:
 
-#+name: users-emma-emacs-ditaa
+,#+name: users-emma-emacs-ditaa
 #+begin_src nix
 {
   programs.doom-emacs.extraPackages = [ pkgs.ditaa ];
@@ -573,8 +577,40 @@ We would like to do sometthing like the following for emacs to find ditaa. But i
 
 #+name: users-emma-emacs-extra-config-ditaa
 #+begin_src elisp
-;(add-hook! 'org-babel-before-execute-hook
-           ;(lambda () (setq org-ditaa-jar-path "${pkgs.ditaa.out}/lib/ditaa.jar")))
+(after! ob-ditaa (defun org-babel-execute:ditaa (body params)
+  "Execute a block of Ditaa code with org-babel.
+This function is called by `org-babel-execute-src-block'."
+  (let* ((ditaa-jar-path "${pkgs.ditaa.out}/bin/ditaa.jar")
+         (out-file (or (cdr (assq :file params))
+                     (error
+                      "ditaa code block requires :file header argument")))
+         (cmdline (cdr (assq :cmdline params)))
+         (java (cdr (assq :java params)))
+         (in-file (org-babel-temp-file "ditaa-"))
+         (eps (cdr (assq :eps params)))
+         (eps-file (when eps (org-babel-process-file-name (concat in-file ".eps"))))
+         (pdf-cmd (when (and (or (string= (file-name-extension out-file) "pdf")
+                                 (cdr (assq :pdf params))))
+                    (concat
+                     "epstopdf"
+                     " " eps-file
+                     " -o=" (org-babel-process-file-name out-file))))
+         (cmd (concat org-babel-ditaa-java-cmd
+                      " " java " " org-ditaa-jar-option " "
+                      (shell-quote-argument
+                       (expand-file-name
+                        (if eps org-ditaa-eps-jar-path ditaa-jar-path)))
+                      " " cmdline
+                      " " (org-babel-process-file-name in-file)
+                      " " (if pdf-cmd
+                              eps-file
+                            (org-babel-process-file-name out-file)))))
+    (unless (file-exists-p ditaa-jar-path)
+    (error "Could not find ditaa.jar at %s" ditaa-jar-path))
+    (with-temp-file in-file (insert body))
+    (message cmd) (shell-command cmd)
+    (when pdf-cmd (message pdf-cmd) (shell-command pdf-cmd))
+    nil))) ;; signal that output has already been written to file
 #+end_src
 
 *** Workarond
@@ -1248,7 +1284,6 @@ Relevant sections:
     is ~org-file-apps~ the relevant variable?
 
 ** TODO [#C] Pomodoro timer in emacs
-** TODO [#C] Make =ditaa= code blocks work with =org-babel=.
 ** TODO [#C] Move ~./doom-emacs/init.el~ into the literate config.
 ** PROJ [#C] Move all of the contents of [[file:emma/][./emma/]] into the literate config.
 ** DONE [#B] Configure doom-emacs so that everything doesn't have to be rebuilt everytime
