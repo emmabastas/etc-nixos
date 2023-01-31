@@ -96,21 +96,10 @@
                     programs.doom-emacs = {
                       extraConfig = ''
                         (setq org-roam-graph-executable "${pkgs.graphviz.out}/bin/dot")
-                        ;(add-hook! 'org-babel-before-execute-hook
-                                   ;(lambda () (setq org-ditaa-jar-pathhh "${pkgs.ditaa.out}/lib/ditaa.jar")))
-                        (setq org-ditaa-jar-path-1 "${pkgs.ditaa.out}/lib/ditaa.jar")
-                        (add-hook! 'org-babel-after-execute-hook
-                          (setq org-ditaa-jar-path-2 "${pkgs.ditaa.out}/lib/ditaa.jar"))
-                        (add-hook! 'org-babel-after-execute-hook
-                          (after! ob-ditaa
-                            (setq org-ditaa-jar-path-3 "${pkgs.ditaa.out}/lib/ditaa.jar")))
-                        (after! ob-ditaa (setq org-ditaa-jar-path-4 "${pkgs.ditaa.out}/lib/ditaa.jar"))
-                        (after! ob-ditaa (setq org-ditaa-jar-path "${pkgs.ditaa.out}/lib/ditaa.jar"))
-                        
                         (after! ob-ditaa (defun org-babel-execute:ditaa (body params)
                           "Execute a block of Ditaa code with org-babel.
                         This function is called by `org-babel-execute-src-block'."
-                          (let* ((ditaa-jar-path "${pkgs.ditaa.out}/bin/ditaa")
+                          (let* ((ditaa-jar-path "${pkgs.ditaa.out}/bin/ditaa.jar")
                                  (out-file (or (cdr (assq :file params))
                                              (error
                                               "ditaa code block requires :file header argument")))
