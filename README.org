@@ -60,6 +60,8 @@
   - [[#find-a-relliable-way-to-override-default-doom-settings-for-packages][Find a relliable way to override default doom settings for packages]]
   - [[#should-i3-be-configured-in-nix-instead-of-in-a-separate-config-file][Should =i3= be configured in nix instead of in a separate config file?]]
   - [[#setup-home-folder-syncing-with-mega][Setup home folder syncing with Mega]]
+  - [[#add-tons-of-math-related-unicode-to-emojify][Add tons of math-related unicode to emojify]]
+  - [[#c--style-shortcut-for-inserting-emojis][~C-*~ style shortcut for inserting emojis]]
   - [[#sometimes-only-the-first-time-when-opening-a-hyperlink-in-emacs-they-are-opened-as-two-tabs-in-ff--one-tab-in-chrome][Sometimes (only the first time?) when opening a hyperlink in emacs they are opened as two tabs in FF + one tab in Chrome.]]
   - [[#pomodoro-timer-in-emacs][Pomodoro timer in emacs]]
   - [[#move-doom-emacsinitel-into-the-literate-config][Move ~./doom-emacs/init.el~ into the literate config.]]
@@ -1113,6 +1115,8 @@ Relevant sections:
     - [[Sound]]
 
 ** DONE [#A] Setup home folder syncing with Mega
+** TODO [#C] Add tons of math-related unicode to emojify
+** TODO [#C] ~C-*~ style shortcut for inserting emojis
 ** TODO [#C] Sometimes (only the first time?) when opening a hyperlink in emacs they are opened as two tabs in FF + one tab in Chrome.
     is ~org-file-apps~ the relevant variable?
 
