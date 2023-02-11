@@ -21,10 +21,6 @@
   - [[#zettelkasten-method-with-org-roam-v2][Zettelkasten-method with =org-roam v2=.]]
     - [[#org-roam-ui][=org-roam-ui=]]
   - [[#relative-line-numbering][Relative line numbering]]
-  - [[#render-ascii-diagrams-with-ditaa][Render ASCII diagrams with =ditaa=]]
-    - [[#how-wed-like-to-do-it-but-doesnt-work][How we'd like to do it (but doesn't work)]]
-    - [[#workarond][Workarond]]
-    - [[#make-ditaa-work-in-emacs-the-way-we-want-to-remove-need-for-workaround][Make ditaa work in Emacs the way we want to, remove need for workaround.]]
   - [[#terminal-emulator][Terminal emulator]]
   - [[#insert-emojis-and-unicode][Insert emojis and unicode]]
     - [[#custom-unicodeemoji-insertion][Custom unicode/emoji insertion]]
@@ -171,7 +167,6 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
                   <<users-emma-emacs-1>>
                   <<users-emma-emacs-2>>
                   <<users-emma-emacs-zettelkasten>>
-                  <<users-emma-emacs-ditaa>>
                   <<users-emma-emacs-python>>
                   <<users-emma-mega-cmd>>
                   <<users-emma-gimp>>
@@ -184,7 +179,6 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
                     programs.doom-emacs = {
                       extraConfig = ''
                         <<users-emma-emacs-extra-config-zettelkasten>>
-                        <<users-emma-emacs-extra-config-ditaa>>
                       '';
                     };
                   }
@@ -566,78 +560,6 @@ Org-roam-ui tries to keep up with the latest features of org-roam, which conflic
 #+begin_src elisp tangle: ./doom-emacs/config.el
 (setq display-line-numbers-type 'relative)
 #+end_src
-
-** Render ASCII diagrams with =ditaa=
-
-Ditaa is a diagram markup language with very loose syntax. We sometimes want to use it in ~.org~ documents with ~org-babel~ to render diagrams.
-
-*** How we'd like to do it (but doesn't work)
-#+begin_quote
-Unfortunately what's described in this section doesn't work for whatever reason.
-There's a workaround in the next secition that's used instead.
-#+end_quote
-
-We install ditaa and make sure emacs can find it:
-
-,#+name: users-emma-emacs-ditaa
-#+begin_src nix
-{
-  programs.doom-emacs.extraPackages = [ pkgs.ditaa ];
-}
-#+end_src
-
-We would like to do sometthing like the following for emacs to find ditaa. But it seams this always gets overwritten....
-
-#+name: users-emma-emacs-extra-config-ditaa
-#+begin_src elisp
-(after! ob-ditaa (defun org-babel-execute:ditaa (body params)
-  "Execute a block of Ditaa code with org-babel.
-This function is called by `org-babel-execute-src-block'."
-  (let* ((ditaa-jar-path "${pkgs.ditaa.out}/bin/ditaa.jar")
-         (out-file (or (cdr (assq :file params))
-                     (error
-                      "ditaa code block requires :file header argument")))
-         (cmdline (cdr (assq :cmdline params)))
-         (java (cdr (assq :java params)))
-         (in-file (org-babel-temp-file "ditaa-"))
-         (eps (cdr (assq :eps params)))
-         (eps-file (when eps (org-babel-process-file-name (concat in-file ".eps"))))
-         (pdf-cmd (when (and (or (string= (file-name-extension out-file) "pdf")
-                                 (cdr (assq :pdf params))))
-                    (concat
-                     "epstopdf"
-                     " " eps-file
-                     " -o=" (org-babel-process-file-name out-file))))
-         (cmd (concat org-babel-ditaa-java-cmd
-                      " " java " " org-ditaa-jar-option " "
-                      (shell-quote-argument
-                       (expand-file-name
-                        (if eps org-ditaa-eps-jar-path ditaa-jar-path)))
-                      " " cmdline
-                      " " (org-babel-process-file-name in-file)
-                      " " (if pdf-cmd
-                              eps-file
-                            (org-babel-process-file-name out-file)))))
-    (unless (file-exists-p ditaa-jar-path)
-    (error "Could not find ditaa.jar at %s" ditaa-jar-path))
-    (with-temp-file in-file (insert body))
-    (message cmd) (shell-command cmd)
-    (when pdf-cmd (message pdf-cmd) (shell-command pdf-cmd))
-    nil))) ;; signal that output has already been written to file
-#+end_src
-
-*** Workarond
-Install ditaa globaly
-
-#+name:users-emma-emacs-ditaa
-#+begin_src nix
-{
-  home.packages = [ pkgs.ditaa ];
-}
-#+end_src
-
-*** TODO [#C] Make ditaa work in Emacs the way we want to, remove need for workaround.
-Related to:[[*Find a relliable way to override default doom settings for packages][ Find a relliable way to override default doom settings for packages]]
 
 ** Terminal emulator
 We're using ~shell~ (see ~init.el~) for our terminal needs.
