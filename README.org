@@ -25,8 +25,8 @@
     - [[#workarond][Workarond]]
     - [[#make-ditaa-work-in-emacs-the-way-we-want-to-remove-need-for-workaround][Make ditaa work in Emacs the way we want to, remove need for workaround.]]
   - [[#terminal-emulator][Terminal emulator]]
-  - [[#insert-emojis][Insert emojis]]
-  - [[#custom-unicodeemoji-insertion][Custom unicode/emoji insertion]]
+  - [[#insert-emojis-and-unicode][Insert emojis and unicode]]
+    - [[#custom-unicodeemoji-insertion][Custom unicode/emoji insertion]]
 - [[#globally-installed-programming-language][Globally installed programming language]]
 - [[#flashcards-setup][Flashcards setup]]
   - [[#org-drill][=org-drill=]]
@@ -650,7 +650,7 @@ The ~term_~ function is based off of ~term~ but with two changes:
 (define-key (current-global-map) (kbd "C-c t") #'term_)
 #+end_src
 
-** Insert emojis
+** Insert emojis and unicode
 :PROPERTIES:
 :ID:       88c7c91a-e4d1-4130-8556-68418df4e65b
 :END:
@@ -667,13 +667,35 @@ By default emojis are rendered as images, but our font has good unicode support 
 #+RESULTS:
 : unicode
 
-** Custom unicode/emoji insertion
+*** Custom unicode/emoji insertion
 We use =emojify= (see [[*Insert emojis][Insert emojis]]) to insert emoji, we can also use this to easilly insert any kind of unicode characters we may want:
 
 #+begin_src elisp :tangle ./doom-emacs/config.el
 (setq emojify-user-emojis '(("—" . (("name" . "Em Dash")
-                                     ("unicode" . "—")
-                                     ("style" . "unicode")))))
+                                    ("unicode" . "—")
+                                    ("style" . "unicode")))
+                            ("⇔" . (("name" . "\\iff")
+                                    ("unicode" . "⇔")
+                                    ("style" . "unicode")))
+                            ("⇒" . (("name" . "\\implies")
+                                    ("unicode" . "⇒")
+                                    ("style" . "unicode")))
+                            ("∀" . (("name" . "\\forall")
+                                    ("unicode" . "∀")
+                                    ("style" . "unicode")))
+                            ("∃" . (("name" . "\\exists")
+                                    ("unicode" . "∃")
+                                    ("style" . "unicode")))
+                            ("■" . (("name" . "\\qed")
+                                    ("unicode" . "■")
+                                    ("style" . "unicode")))
+                            ("≅" . (("name" . "\\cong")
+                                    ("unicode" . "≅")
+                                    ("style" . "unicode")))
+                            ("≤" . (("name" . "\\leq")
+                                    ("unicode" . "≤")
+                                    ("style" . "unicode")))
+                            ))
 
 ;; If emojify is already loaded refresh emoji data
 (when (featurep 'emojify)
