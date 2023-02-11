@@ -68,6 +68,9 @@
                     home.packages = [ pkgs.ditaa ];
                   }
                   {
+                    home.packages = [ pkgs.nodePackages.pyright ];
+                  }
+                  {
                     home.packages = [ pkgs.megacmd ];
                   }
                   {

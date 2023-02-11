@@ -17,6 +17,7 @@
     - [[#font-faces][Font faces]]
     - [[#which-programs-to-use-for-opening-org-links][Which programs to use for opening org links]]
   - [[#spell-checking][Spell checking]]
+  - [[#python-language-server][Python language server]]
   - [[#zettelkasten-method-with-org-roam-v2][Zettelkasten-method with =org-roam v2=.]]
     - [[#org-roam-ui][=org-roam-ui=]]
   - [[#relative-line-numbering][Relative line numbering]]
@@ -171,6 +172,7 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
                   <<users-emma-emacs-2>>
                   <<users-emma-emacs-zettelkasten>>
                   <<users-emma-emacs-ditaa>>
+                  <<users-emma-emacs-python>>
                   <<users-emma-mega-cmd>>
                   <<users-emma-gimp>>
                   <<users-emma-feh>>
@@ -503,6 +505,18 @@ This hasn't been configured successfully, the broken config that might be useful
   '';
 }
 #+end_src
+** Python language server
+We've added ~(python +lsp +pyright)~ to ~./doom-emacs/init.el~.
+
+We also install pyright to the user environment
+
+#+name: users-emma-emacs-python
+#+begin_src nix
+{
+  home.packages = [ pkgs.nodePackages.pyright ];
+}
+#+end_src
+
 ** Zettelkasten-method with =org-roam v2=.
 We install this by manually adding the ~+roam2~ flag to the ~org~ module in ~init.el~.
 
