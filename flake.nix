@@ -77,9 +77,6 @@
                     home.packages = [ pkgs.feh ];
                   }
                   {
-                    home.packages = [ pkgs.signal-desktop ];
-                  }
-                  {
                     home.packages = [ pkgs.tealdeer ];
                   }
                   {

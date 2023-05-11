@@ -38,7 +38,6 @@
   - [[#mathematica][Mathematica]]
   - [[#gimp][Gimp]]
   - [[#feh][Feh]]
-  - [[#signal][Signal]]
   - [[#tldr][Tldr]]
 - [[#backups-with-meganz][Backups with mega.nz]]
 - [[#machine-specific-configuration][Machine specific configuration]]
@@ -171,7 +170,6 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
                   <<users-emma-mega-cmd>>
                   <<users-emma-gimp>>
                   <<users-emma-feh>>
-                  <<users-emma-signal-desktop>>
                   <<users-emma-tldr>>
                   <<users-emma-webwork-flashcard>>
                   <<users-emma-global-pls>>
@@ -810,13 +808,6 @@ After that we can install the nix package:
 #+begin_src nix
 {
   home.packages = [ pkgs.feh ];
-}
-#+end_src
-** Signal
-#+name: users-emma-signal-desktop
-#+begin_src nix
-{
-  home.packages = [ pkgs.signal-desktop ];
 }
 #+end_src
 
