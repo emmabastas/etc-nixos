@@ -84,7 +84,6 @@
                   }
                   {
                     home.packages = [
-                      pkgs.python38
                       pkgs.ghc
                       pkgs.haskell-language-server
                     ];

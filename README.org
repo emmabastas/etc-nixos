@@ -642,7 +642,6 @@ Some languages we find ourselves using quite a lot for simple scripting and we w
 #+begin_src nix
 {
   home.packages = [
-    pkgs.python38
     pkgs.ghc
     pkgs.haskell-language-server
   ];
