@@ -670,6 +670,12 @@ By default org-drill prompts us to save the file when done with the drill sessio
 (setq org-drill-save-buffers-after-drill-sessions-p nil)
 #+end_src
 
+I don't want the card headings to show as they ca reveal information.
+
+#+begin_src elisp :tangle ./doom-emacs/config.el
+(setq org-drill-hide-item-headings-p t)
+#+end_src
+
 ** =webwork-flashcard=
 I've made a custom webserver for integrating webwork problems with my flashcard setup. Read more about it here: https://github.com/emmabastas/webwork-flashcard
 
