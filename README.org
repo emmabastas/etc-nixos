@@ -27,6 +27,7 @@
 - [[#globally-installed-programming-language][Globally installed programming language]]
 - [[#flashcards-setup][Flashcards setup]]
   - [[#org-drill][=org-drill=]]
+  - [[#dynamic-flashcards][Dynamic flashcards]]
   - [[#webwork-flashcard][=webwork-flashcard=]]
 - [[#desktop-environment][Desktop environment]]
 - [[#networking][Networking]]
@@ -676,6 +677,54 @@ I don't want the card headings to show as they ca reveal information.
 (setq org-drill-hide-item-headings-p t)
 #+end_src
 
+** Dynamic flashcards
+
+We define our own flaschard type ~babel_generated~. This card will execute topmost code-block using ~org-babel~ and then display it similar to the ~simple~ card type but without hiding "drawers". Meaning that if you have a flashcard looking something like this:
+
+: *** my test flashcard :drill:
+: :PROPERTIES:
+: :DRILL_CARD_TYPE: babel_generated
+: :END:
+: #+begin_src elisp :results drawer
+: "Hello\n[from]\n~babel~"
+
+It would display like:
+
+: *** my test flashcard :drill:
+: Hello
+: [..]
+: ~babel~
+
+Perty convenient!
+
+Define the flashcard type:
+
+#+begin_src elisp :tangle ./doom-emacs/config.el
+(defun org-drill-present-babel-generated (session)
+  "Present a simple card."
+  (org-babel-next-src-block)
+  (let ((ret (org-babel-execute-src-block)))
+    (org-drill-with-hidden-comments
+     (org-drill-with-hidden-cloze-hints
+      (org-drill-with-hidden-cloze-text
+       (org-drill-hide-all-subheadings-except nil)
+       (org-drill--show-latex-fragments)  ; overlay all LaTeX fragments with images
+       (ignore-errors
+         (org-display-inline-images t))
+       (org-hide-block-all)
+       (prog1 (org-drill-presentation-prompt session)
+         (org-drill-hide-subheadings-if 'org-drill-entry-p)))))))
+#+end_src
+
+Add it to the list of flashcard types:
+
+#+begin_src elisp :tangle ./doom-emacs/config.el
+(add-to-list
+ 'org-drill-card-type-alist
+ '("babel_generated" org-drill-present-babel-generated))
+#+end_src
+
+
 ** =webwork-flashcard=
 I've made a custom webserver for integrating webwork problems with my flashcard setup. Read more about it here: https://github.com/emmabastas/webwork-flashcard
 
@@ -685,6 +734,7 @@ I've made a custom webserver for integrating webwork problems with my flashcard 
   home.packages = [ (pkgs.callPackage ./webwork-flashcard {}) ];
 }
 #+end_src
+
 * Desktop environment
 
 Use =i3= as the window manager:

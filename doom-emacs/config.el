@@ -130,3 +130,22 @@
 (setq org-drill-save-buffers-after-drill-sessions-p nil)
 
 (setq org-drill-hide-item-headings-p t)
+
+(defun org-drill-present-babel-generated (session)
+  "Present a simple card."
+  (org-babel-next-src-block)
+  (let ((ret (org-babel-execute-src-block)))
+    (org-drill-with-hidden-comments
+     (org-drill-with-hidden-cloze-hints
+      (org-drill-with-hidden-cloze-text
+       (org-drill-hide-all-subheadings-except nil)
+       (org-drill--show-latex-fragments)  ; overlay all LaTeX fragments with images
+       (ignore-errors
+         (org-display-inline-images t))
+       (org-hide-block-all)
+       (prog1 (org-drill-presentation-prompt session)
+         (org-drill-hide-subheadings-if 'org-drill-entry-p)))))))
+
+(add-to-list
+ 'org-drill-card-type-alist
+ '("babel_generated" org-drill-present-babel-generated))
