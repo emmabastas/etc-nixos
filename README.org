@@ -19,7 +19,9 @@
   - [[#spell-checking][Spell checking]]
   - [[#python-language-server][Python language server]]
   - [[#zettelkasten-method-with-org-roam-v2][Zettelkasten-method with =org-roam v2=.]]
+    - [[#roam-graph-with-graphviz][roam graph with =graphviz=]]
     - [[#org-roam-ui][=org-roam-ui=]]
+    - [[#custom-capture-templates][Custom capture templates]]
   - [[#relative-line-numbering][Relative line numbering]]
   - [[#terminal-emulator][Terminal emulator]]
   - [[#insert-emojis-and-unicode][Insert emojis and unicode]]
@@ -509,6 +511,7 @@ We also install pyright to the user environment
 ** Zettelkasten-method with =org-roam v2=.
 We install this by manually adding the ~+roam2~ flag to the ~org~ module in ~init.el~.
 
+*** roam graph with =graphviz=
 org-roam uses /graphviz/ to generate a graph from all of the notes. We install the program and make sure that emacs can find the binary:
 
 #+name: users-emma-emacs-zettelkasten
@@ -549,6 +552,37 @@ Org-roam-ui tries to keep up with the latest features of org-roam, which conflic
           org-roam-ui-follow t
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start t))
+#+end_src
+
+*** Custom capture templates
+Capture templates can be used when creating new nodes with org-roam. I've used [[https://systemcrafters.net/build-a-second-brain-in-emacs/capturing-notes-efficiently/][this blogpost]] to guide me through the process.
+
+**** Default template
+#+begin_src elisp :tangle ./doom-emacs/config.el
+(after! org-roam
+  (setq my-org-roam-capture-tempalte-default
+        '("d" "default" plain
+        "%?"
+        :target (file+head "%<%y%m%d%h%m%s>-${slug}.org" "#+title: ${title}\n")
+        :unnarrowed t)))
+#+end_src
+
+**** Book note template
+#+begin_src elisp :tangle ./doom-emacs/config.el
+(after! org-roam
+  (setq my-org-roam-capture-template-book-note
+        '("b" "book note" plain
+        "\n*Child of:* [[id:33cdaa07-757a-491d-af0c-a25cbc9b7231][📚 Notes from reading books]]\n\n*Date read:*\n*ISBN:* /<don't know>/\n\n%?"
+        :target (file+head "%<%y%m%d%h%m%s>-${slug}.org" "#+title: 📚 ${title}\n")
+        :unnarrowed t)))
+#+end_src
+
+**** Setting the =org-roam-capture-templates= variable
+#+begin_src elisp :tangle ./doom-emacs/config.el
+(after! org-roam
+  (setq org-roam-capture-templates
+        (list my-org-roam-capture-tempalte-default
+              my-org-roam-capture-template-book-note)))
 #+end_src
 
 ** Relative line numbering

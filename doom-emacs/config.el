@@ -79,6 +79,25 @@
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start t))
 
+(after! org-roam
+  (setq my-org-roam-capture-tempalte-default
+        '("d" "default" plain
+        "%?"
+        :target (file+head "%<%y%m%d%h%m%s>-${slug}.org" "#+title: ${title}\n")
+        :unnarrowed t)))
+
+(after! org-roam
+  (setq my-org-roam-capture-template-book-note
+        '("b" "book note" plain
+        "\n*Child of:* [[id:33cdaa07-757a-491d-af0c-a25cbc9b7231][📚 Notes from reading books]]\n\n*Date read:*\n*ISBN:* /<don't know>/\n\n%?"
+        :target (file+head "%<%y%m%d%h%m%s>-${slug}.org" "#+title: 📚 ${title}\n")
+        :unnarrowed t)))
+
+(after! org-roam
+  (setq org-roam-capture-templates
+        (list my-org-roam-capture-tempalte-default
+              my-org-roam-capture-template-book-note)))
+
 (defvar nterms 0)
 
 (defun term_ (program)
