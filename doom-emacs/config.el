@@ -11,6 +11,38 @@
   (define-key evil-motion-state-map (kbd "<remap> <evil-forward-char>") 'right-char)
 )
 
+(setq emojify-display-style 'unicode)
+
+(setq emojify-user-emojis '(("—" . (("name" . "Em Dash")
+                                    ("unicode" . "—")
+                                    ("style" . "unicode")))
+                            ("⇔" . (("name" . "\\iff")
+                                    ("unicode" . "⇔")
+                                    ("style" . "unicode")))
+                            ("⇒" . (("name" . "\\implies")
+                                    ("unicode" . "⇒")
+                                    ("style" . "unicode")))
+                            ("∀" . (("name" . "\\forall")
+                                    ("unicode" . "∀")
+                                    ("style" . "unicode")))
+                            ("∃" . (("name" . "\\exists")
+                                    ("unicode" . "∃")
+                                    ("style" . "unicode")))
+                            ("■" . (("name" . "\\qed")
+                                    ("unicode" . "■")
+                                    ("style" . "unicode")))
+                            ("≅" . (("name" . "\\cong")
+                                    ("unicode" . "≅")
+                                    ("style" . "unicode")))
+                            ("≤" . (("name" . "\\leq")
+                                    ("unicode" . "≤")
+                                    ("style" . "unicode")))
+                            ))
+
+;; If emojify is already loaded refresh emoji data
+(when (featurep 'emojify)
+  (emojify-set-emoji-data))
+
 (after! org
   (setq org-todo-keywords
         '((sequence "TODO(t)" "NEXT(n)" "PROJ(p)" "WATCH(w)" "HOLD(h)" "BACKLOG(b)" "|" "DONE(d)" "KILL(k)")
@@ -111,38 +143,6 @@
       (switch-to-buffer (concat "*" termname "*"))))
 
 (define-key (current-global-map) (kbd "C-c t") #'term_)
-
-(setq emojify-display-style 'unicode)
-
-(setq emojify-user-emojis '(("—" . (("name" . "Em Dash")
-                                    ("unicode" . "—")
-                                    ("style" . "unicode")))
-                            ("⇔" . (("name" . "\\iff")
-                                    ("unicode" . "⇔")
-                                    ("style" . "unicode")))
-                            ("⇒" . (("name" . "\\implies")
-                                    ("unicode" . "⇒")
-                                    ("style" . "unicode")))
-                            ("∀" . (("name" . "\\forall")
-                                    ("unicode" . "∀")
-                                    ("style" . "unicode")))
-                            ("∃" . (("name" . "\\exists")
-                                    ("unicode" . "∃")
-                                    ("style" . "unicode")))
-                            ("■" . (("name" . "\\qed")
-                                    ("unicode" . "■")
-                                    ("style" . "unicode")))
-                            ("≅" . (("name" . "\\cong")
-                                    ("unicode" . "≅")
-                                    ("style" . "unicode")))
-                            ("≤" . (("name" . "\\leq")
-                                    ("unicode" . "≤")
-                                    ("style" . "unicode")))
-                            ))
-
-;; If emojify is already loaded refresh emoji data
-(when (featurep 'emojify)
-  (emojify-set-emoji-data))
 
 (setq org-drill-add-random-noise-to-intervals-p t)
 

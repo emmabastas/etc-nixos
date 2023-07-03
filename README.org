@@ -12,20 +12,20 @@
   - [[#moving-around][Moving around]]
     - [[#remove-wierd-after-org-and-add-hook-org-mode-hook--call][Remove wierd ~after! org~ and ~(add-hook 'org-mode-hook ...)~ call]]
     - [[#when-moving-multiple-lines-ex-11j-move-by-logical-lines][When moving multiple lines (ex. ~11j~); move by logical lines]]
-  - [[#org-mode][org-mode]]
+  - [[#relative-line-numbering][Relative line numbering]]
+  - [[#insert-emojis-and-unicode][Insert emojis and unicode]]
+    - [[#custom-unicodeemoji-insertion][Custom unicode/emoji insertion]]
+  - [[#spell-checking-not-active-wasnt-configured-successfully][Spell checking (Not active, wasn't configured successfully)]]
+  - [[#general-org-mode][General =org-mode=]]
     - [[#todo-keywords][TODO-Keywords]]
     - [[#font-faces][Font faces]]
     - [[#which-programs-to-use-for-opening-org-links][Which programs to use for opening org links]]
-  - [[#spell-checking][Spell checking]]
-  - [[#python-language-server][Python language server]]
   - [[#zettelkasten-method-with-org-roam-v2][Zettelkasten-method with =org-roam v2=.]]
     - [[#roam-graph-with-graphviz][roam graph with =graphviz=]]
     - [[#org-roam-ui][=org-roam-ui=]]
     - [[#custom-capture-templates][Custom capture templates]]
-  - [[#relative-line-numbering][Relative line numbering]]
   - [[#terminal-emulator][Terminal emulator]]
-  - [[#insert-emojis-and-unicode][Insert emojis and unicode]]
-    - [[#custom-unicodeemoji-insertion][Custom unicode/emoji insertion]]
+  - [[#python-language-server][Python language server]]
 - [[#globally-installed-programming-language][Globally installed programming language]]
 - [[#flashcards-setup][Flashcards setup]]
   - [[#org-drill][=org-drill=]]
@@ -369,7 +369,106 @@ Is it necesary? Was it added because the rebinds would get overriden otherwise? 
 
 *** TODO [#C] When moving multiple lines (ex. ~11j~); move by logical lines
 When displaying relative line numbers they are displayed following logical lines, and when we're moving multipel lines at once the relative line numbers are what we're looking at, therefore moving multie lines should be interpreted as moving by logical lines
-** org-mode
+** Relative line numbering
+#+begin_src elisp tangle: ./doom-emacs/config.el
+(setq display-line-numbers-type 'relative)
+#+end_src
+
+** Insert emojis and unicode
+:PROPERTIES:
+:ID:       88c7c91a-e4d1-4130-8556-68418df4e65b
+:END:
+We enable emojify in ~init.el~ by adding the ~(emoji +unicode)~ snippet.
+
+If we would like to render ascii or github-style emojis (like :smile) we'd add ~+ascii~ and ~+github~ respectively.
+
+By default emojis are rendered as images, but our font has good unicode support so we'd like to display unicode glyphs as is:
+
+#+begin_src elisp :tangle ./doom-emacs/config.el
+(setq emojify-display-style 'unicode)
+#+end_src
+
+#+RESULTS:
+: unicode
+
+*** Custom unicode/emoji insertion
+We use =emojify= (see [[*Insert emojis][Insert emojis]]) to insert emoji, we can also use this to easilly insert any kind of unicode characters we may want:
+
+#+begin_src elisp :tangle ./doom-emacs/config.el
+(setq emojify-user-emojis '(("—" . (("name" . "Em Dash")
+                                    ("unicode" . "—")
+                                    ("style" . "unicode")))
+                            ("⇔" . (("name" . "\\iff")
+                                    ("unicode" . "⇔")
+                                    ("style" . "unicode")))
+                            ("⇒" . (("name" . "\\implies")
+                                    ("unicode" . "⇒")
+                                    ("style" . "unicode")))
+                            ("∀" . (("name" . "\\forall")
+                                    ("unicode" . "∀")
+                                    ("style" . "unicode")))
+                            ("∃" . (("name" . "\\exists")
+                                    ("unicode" . "∃")
+                                    ("style" . "unicode")))
+                            ("■" . (("name" . "\\qed")
+                                    ("unicode" . "■")
+                                    ("style" . "unicode")))
+                            ("≅" . (("name" . "\\cong")
+                                    ("unicode" . "≅")
+                                    ("style" . "unicode")))
+                            ("≤" . (("name" . "\\leq")
+                                    ("unicode" . "≤")
+                                    ("style" . "unicode")))
+                            ))
+
+;; If emojify is already loaded refresh emoji data
+(when (featurep 'emojify)
+  (emojify-set-emoji-data))
+#+end_src
+#+RESULTS:
+
+See https://github.com/iqbalansari/emacs-emojify#custom-emojis for further reading.
+
+** Spell checking (Not active, wasn't configured successfully)
+This hasn't been configured successfully, the broken config that might be useful for a future atempt looks like this:
+
+~config.el~
+#+begin_src elisp
+(with-eval-after-load "ispell"
+  ;; Configure 'LANG', otherwise 'ispell.el' cannot find a 'default
+  ;; dictionary' even though multiple dictionaries will be configured
+  ;; in next line.
+  (setenv "LANG" "en_US.UTF-8")
+  (setq ispell-program-name "hunspell")
+
+  (setq ispell-dictionary "en_US,sv_SE")
+
+  ;; 'ispell-set-spellchecker-params' has to be called
+  ;; before 'ispell-hunspell-add-multi-dic' will work
+  (ispell-set-spellchecker-params)
+  (ispell-hunspell-add-multi-dic "en_US,sv_SE")
+
+  ;; For saving words to the personal dictionary, don't infer it from
+  ;; the locale, otherwise it would save to ~/.hunspell_de_DE.
+  (setq ispell-personal-dictionary "~/.hunspell_personal_dictionary"))
+
+  ;; The personal dictionary file has to exist, otherwise hunspell will
+  ;; silently not use it.
+  (unless (file-exists-p ispell-personal-dictionary)
+    (write-region "" nil ispell-personal-dictionary nil 0))
+#+end_src
+
+#+begin_src nix
+{
+  let
+    hunspell = hunspellWithDicts ( with hunspellDicts; [ sv-se  en-us ] );
+  in
+  extraConfig = ''
+    (setq exec-path (append exec-path '("${hunspell}/bin")))
+  '';
+}
+#+end_src
+** General =org-mode=
 *** TODO-Keywords
 We define the following keywords:
 
@@ -456,57 +555,6 @@ Now we setup the font faces: (If you're in a org document and want to know the f
 
 For example opening web pages and pdf's with firefox should be configured in a firefox section.
 
-** Spell checking
-This hasn't been configured successfully, the broken config that might be useful for a future atempt looks like this:
-
-~config.el~
-#+begin_src elisp
-(with-eval-after-load "ispell"
-  ;; Configure 'LANG', otherwise 'ispell.el' cannot find a 'default
-  ;; dictionary' even though multiple dictionaries will be configured
-  ;; in next line.
-  (setenv "LANG" "en_US.UTF-8")
-  (setq ispell-program-name "hunspell")
-
-  (setq ispell-dictionary "en_US,sv_SE")
-
-  ;; 'ispell-set-spellchecker-params' has to be called
-  ;; before 'ispell-hunspell-add-multi-dic' will work
-  (ispell-set-spellchecker-params)
-  (ispell-hunspell-add-multi-dic "en_US,sv_SE")
-
-  ;; For saving words to the personal dictionary, don't infer it from
-  ;; the locale, otherwise it would save to ~/.hunspell_de_DE.
-  (setq ispell-personal-dictionary "~/.hunspell_personal_dictionary"))
-
-  ;; The personal dictionary file has to exist, otherwise hunspell will
-  ;; silently not use it.
-  (unless (file-exists-p ispell-personal-dictionary)
-    (write-region "" nil ispell-personal-dictionary nil 0))
-#+end_src
-
-#+begin_src nix
-{
-  let
-    hunspell = hunspellWithDicts ( with hunspellDicts; [ sv-se  en-us ] );
-  in
-  extraConfig = ''
-    (setq exec-path (append exec-path '("${hunspell}/bin")))
-  '';
-}
-#+end_src
-** Python language server
-We've added ~(python +lsp +pyright)~ to ~./doom-emacs/init.el~.
-
-We also install pyright to the user environment
-
-#+name: users-emma-emacs-python
-#+begin_src nix
-{
-  home.packages = [ pkgs.nodePackages.pyright ];
-}
-#+end_src
-
 ** Zettelkasten-method with =org-roam v2=.
 We install this by manually adding the ~+roam2~ flag to the ~org~ module in ~init.el~.
 
@@ -584,11 +632,6 @@ Capture templates can be used when creating new nodes with org-roam. I've used [
               my-org-roam-capture-template-book-note)))
 #+end_src
 
-** Relative line numbering
-#+begin_src elisp tangle: ./doom-emacs/config.el
-(setq display-line-numbers-type 'relative)
-#+end_src
-
 ** Terminal emulator
 We're using ~shell~ (see ~init.el~) for our terminal needs.
 
@@ -614,60 +657,17 @@ The ~term_~ function is based off of ~term~ but with two changes:
 (define-key (current-global-map) (kbd "C-c t") #'term_)
 #+end_src
 
-** Insert emojis and unicode
-:PROPERTIES:
-:ID:       88c7c91a-e4d1-4130-8556-68418df4e65b
-:END:
-We enable emojify in ~init.el~ by adding the ~(emoji +unicode)~ snippet.
+** Python language server
+We've added ~(python +lsp +pyright)~ to ~./doom-emacs/init.el~.
 
-If we would like to render ascii or github-style emojis (like :smile) we'd add ~+ascii~ and ~+github~ respectively.
+We also install pyright to the user environment
 
-By default emojis are rendered as images, but our font has good unicode support so we'd like to display unicode glyphs as is:
-
-#+begin_src elisp :tangle ./doom-emacs/config.el
-(setq emojify-display-style 'unicode)
+#+name: users-emma-emacs-python
+#+begin_src nix
+{
+  home.packages = [ pkgs.nodePackages.pyright ];
+}
 #+end_src
-
-#+RESULTS:
-: unicode
-
-*** Custom unicode/emoji insertion
-We use =emojify= (see [[*Insert emojis][Insert emojis]]) to insert emoji, we can also use this to easilly insert any kind of unicode characters we may want:
-
-#+begin_src elisp :tangle ./doom-emacs/config.el
-(setq emojify-user-emojis '(("—" . (("name" . "Em Dash")
-                                    ("unicode" . "—")
-                                    ("style" . "unicode")))
-                            ("⇔" . (("name" . "\\iff")
-                                    ("unicode" . "⇔")
-                                    ("style" . "unicode")))
-                            ("⇒" . (("name" . "\\implies")
-                                    ("unicode" . "⇒")
-                                    ("style" . "unicode")))
-                            ("∀" . (("name" . "\\forall")
-                                    ("unicode" . "∀")
-                                    ("style" . "unicode")))
-                            ("∃" . (("name" . "\\exists")
-                                    ("unicode" . "∃")
-                                    ("style" . "unicode")))
-                            ("■" . (("name" . "\\qed")
-                                    ("unicode" . "■")
-                                    ("style" . "unicode")))
-                            ("≅" . (("name" . "\\cong")
-                                    ("unicode" . "≅")
-                                    ("style" . "unicode")))
-                            ("≤" . (("name" . "\\leq")
-                                    ("unicode" . "≤")
-                                    ("style" . "unicode")))
-                            ))
-
-;; If emojify is already loaded refresh emoji data
-(when (featurep 'emojify)
-  (emojify-set-emoji-data))
-#+end_src
-#+RESULTS:
-
-See https://github.com/iqbalansari/emacs-emojify#custom-emojis for further reading.
 
 * Globally installed programming language
 Some languages we find ourselves using quite a lot for simple scripting and we want to install them globally to save ourselves from a bunch of ~shell.nix~'s all over the place.
