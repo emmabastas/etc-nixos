@@ -24,6 +24,7 @@
     - [[#roam-graph-with-graphviz][roam graph with =graphviz=]]
     - [[#org-roam-ui][=org-roam-ui=]]
     - [[#custom-capture-templates][Custom capture templates]]
+  - [[#read-pdfs-and-epubs-with-pdftools-novel-and-anotate-them-with-noter][Read pdf's and epub's with =pdftools=, =nov.el= and anotate them with =noter=]]
   - [[#terminal-emulator][Terminal emulator]]
   - [[#python-language-server][Python language server]]
 - [[#globally-installed-programming-language][Globally installed programming language]]
@@ -164,6 +165,7 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
                   <<users-emma-emacs-1>>
                   <<users-emma-emacs-2>>
                   <<users-emma-emacs-zettelkasten>>
+                  <<users-emma-emacs-nov-el>>
                   <<users-emma-emacs-python>>
                   <<users-emma-mega-cmd>>
                   <<users-emma-gimp>>
@@ -175,6 +177,7 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
                     programs.doom-emacs = {
                       extraConfig = ''
                         <<users-emma-emacs-extra-config-zettelkasten>>
+                        <<users-emma-emacs-extra-config-nov-el>>
                       '';
                     };
                   }
@@ -281,7 +284,7 @@ So what happens is we make two derivations containing files in ~./doom-emacs/~ t
 (This snippet of code is based off: https://github.com/nix-community/nix-doom-emacs/blob/9cbb1c3aa7b957bd2f88215c08c3cb3f55f8e2bb/checks.nix#L46-L64)
 
 #+name: users-emma-emacs-1
-#+begin_src nix
+#+begin_src nix :noweb yes
 {
   programs.doom-emacs = {
     doomPrivateDir = pkgs.linkFarm "doom-config" [
@@ -630,6 +633,41 @@ Capture templates can be used when creating new nodes with org-roam. I've used [
   (setq org-roam-capture-templates
         (list my-org-roam-capture-tempalte-default
               my-org-roam-capture-template-book-note)))
+#+end_src
+
+** Read pdf's and epub's with =pdftools=, =nov.el= and anotate them with =noter=
+=noter= allows us to annotate our documents and =nov.el= displays epubs in emacs, these two go very well together!
+
+We added ~+noter~ flag to the ~org~ module in ~doom-emacs/init.el~
+[[https://github.com/weirdNox/org-noter][Documentation for noter]]
+
+We add the ~pdf~ module in ~doom-emacs/init.el~ to get =pdftools=
+
+We install =nov.el= via ~packages.el~:
+
+#+begin_src elisp :tangle ./doom-emacs/packages.el
+(package! nov)
+#+end_src
+
+=nov.el= uses ~unzip~ when reading epubs, let's make sure that's availible
+[[https://depp.brause.cc/nov.el/][Documentation for nov.el]]
+
+#+name: users-emma-emacs-nov-el
+#+begin_src nix
+{
+  programs.doom-emacs.extraPackages = [ pkgs.unzip ];
+}
+#+end_src
+
+#+name: users-emma-emacs-extra-config-nov-el
+#+begin_src elisp
+(setq nov-unzip-program "${pkgs.unzip.out}/bin/unzip")
+#+end_src
+
+Now we make sure to activate ~nov-mode~ on reading ~.epub~
+
+#+begin_src elisp :tangle ./doom-emacs/config.el
+(add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
 #+end_src
 
 ** Terminal emulator

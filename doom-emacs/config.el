@@ -130,6 +130,8 @@
         (list my-org-roam-capture-tempalte-default
               my-org-roam-capture-template-book-note)))
 
+(add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+
 (defvar nterms 0)
 
 (defun term_ (program)
