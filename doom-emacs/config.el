@@ -121,7 +121,7 @@
 (after! org-roam
   (setq my-org-roam-capture-template-book-note
         '("b" "book note" plain
-        "\n*Child of:* [[id:33cdaa07-757a-491d-af0c-a25cbc9b7231][📚 Notes from reading books]]\n\n*Date read:*\n*ISBN:* /<don't know>/\n\n%?"
+        "\n*Child of:* [[id:33cdaa07-757a-491d-af0c-a25cbc9b7231][📚 Notes from reading books]]\n\n*Date read:*\n*ISBN:* \n*Source URI:* \n\n%?"
         :target (file+head "%<%y%m%d%h%m%s>-${slug}.org" "#+title: 📚 ${title}\n")
         :unnarrowed t)))
 

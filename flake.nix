@@ -65,6 +65,9 @@
                     programs.doom-emacs.extraPackages = [ pkgs.graphviz ];
                   }
                   {
+                    programs.doom-emacs.extraPackages = [ pkgs.unzip ];
+                  }
+                  {
                     home.packages = [ pkgs.nodePackages.pyright ];
                   }
                   {
@@ -92,6 +95,7 @@
                     programs.doom-emacs = {
                       extraConfig = ''
                         (setq org-roam-graph-executable "${pkgs.graphviz.out}/bin/dot")
+                        (setq nov-unzip-program "${pkgs.unzip.out}/bin/unzip")
                       '';
                     };
                   }
