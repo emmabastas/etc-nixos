@@ -34,6 +34,7 @@
 - [[#desktop-environment][Desktop environment]]
 - [[#networking][Networking]]
   -  [[#managing-networkmanager-connections-delete-connections-see-passwords][Managing =NetworkManager= connections (delete connections, see passwords)]]
+  - [[#vpn][VPN]]
 - [[#localizationkeymaptimezone][Localization/keymap/timezone]]
 - [[#other-packages][Other packages]]
   - [[#vim][Vim]]
@@ -168,6 +169,7 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
                   <<users-emma-emacs-nov-el>>
                   <<users-emma-emacs-python>>
                   <<users-emma-mega-cmd>>
+                  <<users-emma-mullvad>>
                   <<users-emma-gimp>>
                   <<users-emma-feh>>
                   <<users-emma-tldr>>
@@ -197,6 +199,7 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
             <<system-wide-boot>>
             <<system-wide-networking-1>>
             <<system-wide-networking-2>>
+            <<system-wide-networking-vpn>>
             <<system-wide-localization>>
             <<system-wide-machine-specific>>
             <<system-wide-high-res-1>>
@@ -814,6 +817,23 @@ We also want to use =NetworkManager= witout ~sudo~:
 **  Managing =NetworkManager= connections (delete connections, see passwords)
 
 Connections are stored in [[/etc/NetworkManager/system-connections/]] (requires ~sudo~).
+
+** VPN
+#+name: system-wide-networking-vpn
+#+begin_src nix
+{
+  services.mullvad-vpn.enable = true;
+}
+#+end_src
+
+~mullvad~ is used to configure the VPN:
+
+#+name: users-emma-mullvad
+#+begin_src nix
+{
+  home.packages = [ pkgs.mullvad ];
+}
+#+end_src
 
 * Localization/keymap/timezone
 

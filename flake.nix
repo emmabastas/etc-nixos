@@ -74,6 +74,9 @@
                     home.packages = [ pkgs.megacmd ];
                   }
                   {
+                    home.packages = [ pkgs.mullvad ];
+                  }
+                  {
                     home.packages = [ pkgs.gimp ];
                   }
                   {
@@ -135,6 +138,9 @@
             }
             {
               users.users.emma.extraGroups = [ "networkmanager" ];
+            }
+            {
+              services.mullvad-vpn.enable = true;
             }
             {
               i18n.defaultLocale = "en_US.UTF-8";
