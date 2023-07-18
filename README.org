@@ -43,6 +43,7 @@
   - [[#gimp][Gimp]]
   - [[#feh][Feh]]
   - [[#tldr][Tldr]]
+  - [[#zip-and-unzip][zip and unzip]]
 - [[#backups-with-meganz][Backups with mega.nz]]
 - [[#machine-specific-configuration][Machine specific configuration]]
     - [[#high-res-screen][High-res screen]]
@@ -173,6 +174,7 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
                   <<users-emma-gimp>>
                   <<users-emma-feh>>
                   <<users-emma-tldr>>
+                  <<users-emma-zip-unzip>>
                   <<users-emma-webwork-flashcard>>
                   <<users-emma-global-pls>>
                   {
@@ -913,6 +915,13 @@ Tealdr is a rust implementation of tldr
 }
 #+end_src
 
+** zip and unzip
+#+name: users-emma-zip-unzip
+#+begin_src nix
+{
+  home.packages = [ pkgs.zip pkgs.unzip ];
+}
+#+end_src
 * Backups with mega.nz
 /NOTE: All of the setup here is statefull, not done automatically by nix./
 

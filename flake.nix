@@ -86,6 +86,9 @@
                     home.packages = [ pkgs.tealdeer ];
                   }
                   {
+                    home.packages = [ pkgs.zip pkgs.unzip ];
+                  }
+                  {
                     home.packages = [ (pkgs.callPackage ./webwork-flashcard {}) ];
                   }
                   {
