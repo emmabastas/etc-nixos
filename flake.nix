@@ -25,7 +25,7 @@
 
   in {
     nixosConfigurations = {
-      nixos = lib.nixosSystem {
+      acomputer = lib.nixosSystem {
         inherit system;
 
         modules = [
@@ -191,6 +191,141 @@
                   }
                 ])
               ];
+              users.foo =
+              let
+                shellScript = cmd: {
+                  text = ''
+                    #!/bin/sh
+                    ${cmd}
+                  '';
+                  executable = true;
+                };
+              
+                applicationScript = cmd: shellScript ''
+                  (${cmd} &)
+                  kill $(expr $PPID - 1)
+                '';
+              in
+              lib.mkMerge [
+                nix-doom-emacs.hmModule
+                ({ pkgs, ... }: utils.recursiveMerge [
+                  (
+                  let
+                    spectre-cli = pkgs.callPackage ./spectre-cli.nix {};
+                  in
+                  {
+                    home.packages = [ spectre-cli ];
+                    home.shellAliases = {
+                      spectre = ''${spectre-cli}/bin/spectre -q'';
+                    };
+                  }
+                  )
+                  {
+                    programs.git = {
+                      enable = true;
+                      extraConfig = {
+                        core.editor = "${(pkgs.callPackage ./vim-cli.nix {}).out}/bin/vim";
+                        init.defaultBranch = "main";
+                      };
+                      ignores = [ "*.swp" ];
+                    };
+                  }
+                  {
+                    programs.doom-emacs = {
+                      doomPrivateDir = pkgs.linkFarm "doom-config" [
+                        { name = "config.el"; path = ./doom-emacs/config.el; }
+                        { name = "init.el";   path = ./doom-emacs/init.el; }
+                        # Should *not* fail because we're building our straight environment
+                        # using the doomPackageDir, not the doomPrivateDir.
+                        {
+                          name = "packages.el";
+                          path = pkgs.writeText "packages.el" "(package! not-a-valid-package)";
+                        }
+                      ];
+                      doomPackageDir = pkgs.linkFarm "doom-config" [
+                        # straight needs a (possibly empty) `config.el` file to build
+                        { name = "config.el";   path = pkgs.emptyFile; }
+                        { name = "init.el";     path = ./doom-emacs/init.el; }
+                        { name = "packages.el"; path = ./doom-emacs/packages.el; }
+                      ];
+                    };
+                  }
+                  {
+                    programs.doom-emacs.enable = true;
+                    services.emacs.enable = true;
+                  }
+                  {
+                    home.file = {
+                      "bin/emacs" = applicationScript "emacsclient -cn $@";
+                      "bin/emacs-debug" = shellScript "emacs-28.1 -l /home/emma/etc-nixos/doom-emacs/config.el $@";
+                    };
+                  }
+                  {
+                    home.packages = [ pkgs.nodePackages.pyright ];
+                  }
+                  {
+                    home.packages = [ pkgs.mullvad ];
+                  }
+                  {
+                    home.packages = [ pkgs.tealdeer ];
+                  }
+                  {
+                    home.packages = [ pkgs.zip pkgs.unzip ];
+                  }
+                  {
+                    home.packages = [
+                      pkgs.ghc
+                      pkgs.haskell-language-server
+                    ];
+                  }
+                  (
+                  let
+                    firefox = pkgs.firefox;
+                  in
+                  {
+                    home.packages = [ firefox ];
+                    home.file."bin/firefox" = applicationScript "${firefox}/bin/firefox $@";
+                  }
+                  )
+                  {
+                    home.packages = [ (pkgs.callPackage ./vim-cli.nix {}) ];
+                  }
+                  {
+                    home.packages = [ pkgs.direnv ];
+                  }
+                  {
+                    home.packages = [ (pkgs.callPackage ./st {}) ];
+                  }
+                  {
+                    home.packages = [ (pkgs.nerdfonts.override { fonts = [ "FiraCode" ]; }) ];
+                    fonts.fontconfig.enable = true;
+                  }
+                  {
+                    programs.ssh.enable = true;
+                  }
+                  {
+                    programs.bash = {
+                      enable = true;
+                      bashrcExtra = ''
+                        export PATH=$HOME/bin:$PATH
+                        eval "$(${pkgs.direnv}/bin/direnv hook bash)"
+                      '';
+                    };
+                  }
+                  {
+                    home.file.".config/i3/config".source = ./i3.conf;
+                  }
+                  {
+                    home.file.".config/nix/nix.conf".text = ''experimental-features = nix-command flakes'';
+                  }
+                  {
+                    programs.doom-emacs = {
+                      extraConfig = ''
+                      '';
+                    };
+                  }
+                ])
+              ];
             };
           }
           ({ config, pkgs, ... }: (utils.recursiveMerge [
@@ -198,6 +333,11 @@
               imports = [ utils.hardwareConfig ];
 
               users.users.emma = {
+                isNormalUser = true;
+                extraGroups = [ "wheel" ];
+              };
+
+              users.users.foo = {
                 isNormalUser = true;
                 extraGroups = [ "wheel" ];
               };
@@ -236,7 +376,7 @@
               time.timeZone = "Europe/Stockholm";
             }
             {
-              networking.hostName = "nixos";
+              networking.hostName = "acomputer";
             }
             {
               console = {

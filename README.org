@@ -8,7 +8,7 @@
 - [[#nix-environment-for-this-config][Nix environment for this config]]
 - [[#root-config][Root config]]
   - [[#utility-functions][Utility functions]]
-- [[#user-emmabastas][user ~emmabastas~]]
+- [[#user-emma][user ~emma~]]
   - [[#enable-nixos-flakes][Enable nixos flakes]]
     - [[#is-this-really-the-right-place-for-this][is this really the right place for this?]]
   - [[#i3-config][I3 config]]
@@ -42,6 +42,9 @@
     - [[#org-drill][=org-drill=]]
     - [[#webwork-flashcard][=webwork-flashcard=]]
   - [[#backups-with-meganz][Backups with mega.nz]]
+- [[#user-foo][user ~foo~]]
+  - [[#spectre][Spectre]]
+  - [[#git-1][Git]]
 - [[#desktop-environment][Desktop environment]]
 - [[#networking][Networking]]
   -  [[#managing-networkmanager-connections-delete-connections-see-passwords][Managing =NetworkManager= connections (delete connections, see passwords)]]
@@ -158,7 +161,7 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
 
   in {
     nixosConfigurations = {
-      nixos = lib.nixosSystem {
+      acomputer = lib.nixosSystem {
         inherit system;
 
         modules = [
@@ -167,6 +170,7 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
               useGlobalPkgs = true;
               useUserPackages = true;
               <<users-emma>>
+              <<users-foo>>
             };
           }
           ({ config, pkgs, ... }: (utils.recursiveMerge [
@@ -174,6 +178,11 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
               imports = [ utils.hardwareConfig ];
 
               users.users.emma = {
+                isNormalUser = true;
+                extraGroups = [ "wheel" ];
+              };
+
+              users.users.foo = {
                 isNormalUser = true;
                 extraGroups = [ "wheel" ];
               };
@@ -246,7 +255,7 @@ lib: {
 }
 #+end_src
 
-* user ~emmabastas~
+* user ~emma~
 Here we can configure programs for the main user account
 
 #+name: users-emma
@@ -1012,6 +1021,90 @@ mega-mkdir -p /backups/samsung_940x/daily/
 mega-backup /home/emma/org/ /backups/samsung_940x/daily/ --period="0 0 10 * * *" --num-backups=10
 #+end_src
 
+* user ~foo~
+An alternative account to use with our hacker persona /s
+
+We want it to look a lot like the main ~emmabastas~ account
+
+#+name: users-foo
+#+begin_src nix :noweb yes
+users.foo =
+let
+  shellScript = cmd: {
+    text = ''
+      #!/bin/sh
+      ${cmd}
+    '';
+    executable = true;
+  };
+
+  applicationScript = cmd: shellScript ''
+    (${cmd} &)
+    kill $(expr $PPID - 1)
+  '';
+in
+lib.mkMerge [
+  nix-doom-emacs.hmModule
+  ({ pkgs, ... }: utils.recursiveMerge [
+    <<users-foo-spectre-cli>>
+    <<users-foo-git>>
+    <<users-emma-emacs-1>>
+    <<users-emma-emacs-2>>
+    <<users-emma-emacs-3>>
+    <<users-emma-emacs-python>>
+    <<users-emma-mullvad>>
+    <<users-emma-tldr>>
+    <<users-emma-zip-unzip>>
+    <<users-emma-global-pls>>
+    <<users-emma-firefox>>
+    <<users-emma-vim>>
+    <<users-emma-direnv>>
+    <<users-emma-st>>
+    <<users-emma-nerdfonts>>
+    <<users-emma-ssh>>
+    <<users-emma-bash>>
+    <<users-emma-i3>>
+    <<users-emma-nix-flakes>>
+    {
+      programs.doom-emacs = {
+        extraConfig = ''
+        '';
+      };
+    }
+  ])
+];
+#+end_src
+
+** Spectre
+#+name: users-foo-spectre-cli
+#+begin_src nix
+(
+let
+  spectre-cli = pkgs.callPackage ./spectre-cli.nix {};
+in
+{
+  home.packages = [ spectre-cli ];
+  home.shellAliases = {
+    spectre = ''${spectre-cli}/bin/spectre -q'';
+  };
+}
+)
+#+end_src
+
+** Git
+#+name: users-foo-git
+#+begin_src nix
+{
+  programs.git = {
+    enable = true;
+    extraConfig = {
+      core.editor = "${(pkgs.callPackage ./vim-cli.nix {}).out}/bin/vim";
+      init.defaultBranch = "main";
+    };
+    ignores = [ "*.swp" ];
+  };
+}
+#+end_src
 * Desktop environment
 
 Use =i3= as the window manager:
@@ -1147,7 +1240,7 @@ I'm currently running my config on a single machine, so no need to split up this
 #+name: system-wide-machine-specific
 #+begin_src nix
 {
-  networking.hostName = "nixos";
+  networking.hostName = "acomputer";
 }
 #+end_src
 
