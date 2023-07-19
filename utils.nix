@@ -65,13 +65,13 @@ lib: {
       # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
       networking.useDHCP = lib.mkDefault true;
       # networking.interfaces.enp3s0.useDHCP = lib.mkDefault true;
-      # networking.interfaces.wg-mullvad.useDHCP = lib.mkDefault true;
       # networking.interfaces.wlp2s0.useDHCP = lib.mkDefault true;
     
       hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
-      # high-resolution display
-      hardware.video.hidpi.enable = lib.mkDefault true;
-    }
     
+      # This option in deprecated in 23.05
+      # high-resolution display
+      #hardware.video.hidpi.enable = lib.mkDefault true;
+    }
   );
 }

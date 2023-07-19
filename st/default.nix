@@ -11,7 +11,7 @@ st.overrideAttrs (oldAttrs: rec {
     # ligatures patch
     (fetchpatch {
       url = "https://st.suckless.org/patches/ligatures/0.8.4/st-ligatures-20210824-0.8.4.diff";
-      sha256 = "1mz7dlyc5zykmvk8q33v2090d3immxzrd06x1snyv28z4q0szds8";
+      hash = "sha256-uRP9dijVDGjHaLe+kNo1boDGkM/dGonVZIdMwDKb72Y=";
     })
   ];
   configFile = writeText "config.def.h" (builtins.readFile ./st.h);

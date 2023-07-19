@@ -2,9 +2,9 @@
   description = "emmabastas system configuration";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-22.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-23.05";
     home-manager = {
-      url = "github:nix-community/home-manager/release-22.05";
+      url = "github:nix-community/home-manager/release-23.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-doom-emacs.url = "github:nix-community/nix-doom-emacs";
@@ -51,6 +51,9 @@
               lib.mkMerge [
                 nix-doom-emacs.hmModule
                 ({ pkgs, ... }: utils.recursiveMerge [
+                  {
+                    home.stateVersion = "21.11";
+                  }
                   {
                     programs.doom-emacs = {
                       doomPrivateDir = pkgs.linkFarm "doom-config" [
@@ -209,6 +212,9 @@
               lib.mkMerge [
                 nix-doom-emacs.hmModule
                 ({ pkgs, ... }: utils.recursiveMerge [
+                  {
+                    home.stateVersion = "21.11";
+                  }
                   (
                   let
                     spectre-cli = pkgs.callPackage ./spectre-cli.nix {};
@@ -341,6 +347,8 @@
                 isNormalUser = true;
                 extraGroups = [ "wheel" ];
               };
+
+              system.stateVersion = "21.11";
             }
             {
               # Use the systemd-boot EFI boot loader.
@@ -388,7 +396,6 @@
             {
               services.xserver = {
                 videoDrivers = [ "modesetting" ];
-                useGlamor = true;
                 dpi = 220;
               };
             }
@@ -436,15 +443,6 @@
               services.openssh.enable = true;
             }
             
-            {
-              # This value determines the NixOS release from which the default
-              # settings for stateful data, like file locations and database versions
-              # on your system were taken. It‘s perfectly fine and recommended to leave
-              # this value at the release version of the first install of this system.
-              # Before changing this value read the documentation for this option
-              # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-              system.stateVersion = "21.11"; # Did you read the comment?
-            }
           ]))
         ];
       };
