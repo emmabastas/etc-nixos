@@ -33,10 +33,24 @@
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
-              users.emma = lib.mkMerge [
+              users.emma =
+              let
+                shellScript = cmd: {
+                  text = ''
+                    #!/bin/sh
+                    ${cmd}
+                  '';
+                  executable = true;
+                };
+              
+                applicationScript = cmd: shellScript ''
+                  (${cmd} &)
+                  kill $(expr $PPID - 1)
+                '';
+              in
+              lib.mkMerge [
                 nix-doom-emacs.hmModule
                 ({ pkgs, ... }: utils.recursiveMerge [
-                  ((import ./emma) { pkgs = pkgs; })
                   {
                     programs.doom-emacs = {
                       doomPrivateDir = pkgs.linkFarm "doom-config" [
@@ -60,6 +74,12 @@
                   {
                     programs.doom-emacs.enable = true;
                     services.emacs.enable = true;
+                  }
+                  {
+                    home.file = {
+                      "bin/emacs" = applicationScript "emacsclient -cn $@";
+                      "bin/emacs-debug" = shellScript "emacs-28.1 -l /home/emma/etc-nixos/doom-emacs/config.el $@";
+                    };
                   }
                   {
                     programs.doom-emacs.extraPackages = [ pkgs.graphviz ];
@@ -96,6 +116,70 @@
                       pkgs.ghc
                       pkgs.haskell-language-server
                     ];
+                  }
+                  (
+                  let
+                    spectre-cli = pkgs.callPackage ./spectre-cli.nix {};
+                  in
+                  {
+                    home.packages = [ spectre-cli ];
+                    home.shellAliases = {
+                      spectre = ''SPECTRE_USERNAME="emmabastas" ${spectre-cli}/bin/spectre -q'';
+                      spectre_ = ''${spectre-cli}/bin/spectre -q'';
+                    };
+                  }
+                  )
+                  (
+                  let
+                    firefox = pkgs.firefox;
+                  in
+                  {
+                    home.packages = [ firefox ];
+                    home.file."bin/firefox" = applicationScript "${firefox}/bin/firefox $@";
+                  }
+                  )
+                  {
+                    home.packages = [ (pkgs.callPackage ./vim-cli.nix {}) ];
+                  }
+                  {
+                    home.packages = [ pkgs.direnv ];
+                  }
+                  {
+                    home.packages = [ (pkgs.callPackage ./st {}) ];
+                  }
+                  {
+                    home.packages = [ (pkgs.nerdfonts.override { fonts = [ "FiraCode" ]; }) ];
+                    fonts.fontconfig.enable = true;
+                  }
+                  {
+                    programs.ssh.enable = true;
+                  }
+                  {
+                    programs.bash = {
+                      enable = true;
+                      bashrcExtra = ''
+                        export PATH=$HOME/bin:$PATH
+                        eval "$(${pkgs.direnv}/bin/direnv hook bash)"
+                      '';
+                    };
+                  }
+                  {
+                    programs.git = {
+                      enable = true;
+                      userName = "emmabastas";
+                      userEmail = "emma.bastas@protonmail.com";
+                      extraConfig = {
+                        core.editor = "${(pkgs.callPackage ./vim-cli.nix {}).out}/bin/vim";
+                        init.defaultBranch = "main";
+                      };
+                      ignores = [ "*.swp" ];
+                    };
+                  }
+                  {
+                    home.file.".config/i3/config".source = ./i3.conf;
+                  }
+                  {
+                    home.file.".config/nix/nix.conf".text = ''experimental-features = nix-command flakes'';
                   }
                   {
                     programs.doom-emacs = {

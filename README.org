@@ -9,6 +9,13 @@
 - [[#root-config][Root config]]
   - [[#utility-functions][Utility functions]]
 - [[#user-emmabastas][user ~emmabastas~]]
+  - [[#enable-nixos-flakes][Enable nixos flakes]]
+    - [[#is-this-really-the-right-place-for-this][is this really the right place for this?]]
+  - [[#i3-config][I3 config]]
+    - [[#dissribute-i3-conf-to-other-sections-where-it-makes-sense-to-have-it][dissribute i3 conf to other sections where it makes sense to have it]]
+  - [[#basic-terminal-and-shell][Basic terminal and shell]]
+  - [[#ssh][ssh]]
+  - [[#git][git]]
   - [[#emacs][Emacs]]
     - [[#moving-around][Moving around]]
     - [[#relative-line-numbering][Relative line numbering]]
@@ -20,11 +27,16 @@
     - [[#read-pdfs-and-epubs-with-pdftools-novel-and-anotate-them-with-noter][Read pdf's and epub's with =pdftools=, =nov.el= and anotate them with =noter=]]
     - [[#terminal-emulator][Terminal emulator]]
     - [[#python-language-server][Python language server]]
+  - [[#direnv][direnv]]
+    - [[#move-emacs-for-direnv-config-here][Move emacs for direnv config here]]
   - [[#misc-programs-specific-to-emma][Misc programs specific to emma]]
+    - [[#firefox][firefox]]
     - [[#gimp][Gimp]]
     - [[#feh][Feh]]
     - [[#tldr][Tldr]]
     - [[#zip-and-unzip][zip and unzip]]
+    - [[#spectre-cli][spectre-cli]]
+    - [[#customized-vim][customized vim]]
   - [[#globally-installed-programming-language][Globally installed programming language]]
   - [[#flashcards-setup][Flashcards setup]]
     - [[#org-drill][=org-drill=]]
@@ -48,7 +60,7 @@
     - [[#result-of-nixos-generate-config][Result of ~nixos-generate-config~.]]
 - [[#misc][Misc]]
   - [[#use-x-server][Use X server:]]
-  - [[#ssh][SSH]]
+  - [[#ssh-1][SSH]]
   - [[#state-version][State version]]
 - [[#global-todos][Global TODOS]]
   - [[#find-a-relliable-way-to-override-default-doom-settings-for-packages][Find a relliable way to override default doom settings for packages]]
@@ -239,12 +251,27 @@ Here we can configure programs for the main user account
 
 #+name: users-emma
 #+begin_src nix :noweb yes
-users.emma = lib.mkMerge [
+users.emma =
+let
+  shellScript = cmd: {
+    text = ''
+      #!/bin/sh
+      ${cmd}
+    '';
+    executable = true;
+  };
+
+  applicationScript = cmd: shellScript ''
+    (${cmd} &)
+    kill $(expr $PPID - 1)
+  '';
+in
+lib.mkMerge [
   nix-doom-emacs.hmModule
   ({ pkgs, ... }: utils.recursiveMerge [
-    ((import ./emma) { pkgs = pkgs; })
     <<users-emma-emacs-1>>
     <<users-emma-emacs-2>>
+    <<users-emma-emacs-3>>
     <<users-emma-emacs-zettelkasten>>
     <<users-emma-emacs-nov-el>>
     <<users-emma-emacs-python>>
@@ -256,6 +283,17 @@ users.emma = lib.mkMerge [
     <<users-emma-zip-unzip>>
     <<users-emma-webwork-flashcard>>
     <<users-emma-global-pls>>
+    <<users-emma-spectre-cli>>
+    <<users-emma-firefox>>
+    <<users-emma-vim>>
+    <<users-emma-direnv>>
+    <<users-emma-st>>
+    <<users-emma-nerdfonts>>
+    <<users-emma-ssh>>
+    <<users-emma-bash>>
+    <<users-emma-git>>
+    <<users-emma-i3>>
+    <<users-emma-nix-flakes>>
     {
       programs.doom-emacs = {
         extraConfig = ''
@@ -268,6 +306,83 @@ users.emma = lib.mkMerge [
 ];
 #+end_src
 
+** Enable nixos flakes
+We need this to use nix flakes??
+
+#+name: users-emma-nix-flakes
+#+begin_src nix
+{
+  home.file.".config/nix/nix.conf".text = ''experimental-features = nix-command flakes'';
+}
+#+end_src
+*** TODO is this really the right place for this?
+** I3 config
+#+name: users-emma-i3
+#+begin_src nix
+{
+  home.file.".config/i3/config".source = ./i3.conf;
+}
+#+end_src
+*** TODO dissribute i3 conf to other sections where it makes sense to have it
+** Basic terminal and shell
+
+We use our own st package for the terminal
+
+#+name: users-emma-st
+#+begin_src nix
+{
+  home.packages = [ (pkgs.callPackage ./st {}) ];
+}
+#+end_src
+
+The st package is configured to use =FiraCode=
+
+#+name: users-emma-nerdfonts
+#+begin_src nix
+{
+  home.packages = [ (pkgs.nerdfonts.override { fonts = [ "FiraCode" ]; }) ];
+  fonts.fontconfig.enable = true;
+}
+#+end_src
+
+This is our shell configuration
+
+#+name: users-emma-bash
+#+begin_src nix :noweb yes
+{
+  programs.bash = {
+    enable = true;
+    bashrcExtra = ''
+      export PATH=$HOME/bin:$PATH
+      <<users-emma-direnv-bashrc-extra>>
+    '';
+  };
+}
+#+end_src
+
+** ssh
+#+name: users-emma-ssh
+#+begin_src nix
+{
+  programs.ssh.enable = true;
+}
+#+end_src
+** git
+#+name: users-emma-git
+#+begin_src nix
+{
+  programs.git = {
+    enable = true;
+    userName = "emmabastas";
+    userEmail = "emma.bastas@protonmail.com";
+    extraConfig = {
+      core.editor = "${(pkgs.callPackage ./vim-cli.nix {}).out}/bin/vim";
+      init.defaultBranch = "main";
+    };
+    ignores = [ "*.swp" ];
+  };
+}
+#+end_src
 ** Emacs
 We're using [[https://github.com/doomemacs/doomemacs][doom-emacs]]:
 
@@ -321,6 +436,18 @@ Lastly we run the emacs server on login:
 {
   programs.doom-emacs.enable = true;
   services.emacs.enable = true;
+}
+#+end_src
+
+Also we add some two convenience script for starting and debugging emacs
+
+#+name: users-emma-emacs-3
+#+begin_src nix
+{
+  home.file = {
+    "bin/emacs" = applicationScript "emacsclient -cn $@";
+    "bin/emacs-debug" = shellScript "emacs-28.1 -l /home/emma/etc-nixos/doom-emacs/config.el $@";
+  };
 }
 #+end_src
 
@@ -716,7 +843,36 @@ We also install pyright to the user environment
 
 **** TODO Can pyright be installed so that only emacs can see it? Only emacs uses it
 
+** direnv
+#+name: users-emma-direnv
+#+begin_src nix
+{
+  home.packages = [ pkgs.direnv ];
+}
+#+end_src
+
+We add a direnv hook to bash
+
+#+name: users-emma-direnv-bashrc-extra
+#+begin_src shell
+eval "$(${pkgs.direnv}/bin/direnv hook bash)"
+#+end_src
+
+*** TODO Move emacs for direnv config here
 ** Misc programs specific to emma
+*** firefox
+#+name: users-emma-firefox
+#+begin_src nix
+(
+let
+  firefox = pkgs.firefox;
+in
+{
+  home.packages = [ firefox ];
+  home.file."bin/firefox" = applicationScript "${firefox}/bin/firefox $@";
+}
+)
+#+end_src
 *** Gimp
 #+name: users-emma-gimp
 #+begin_src nix
@@ -746,6 +902,33 @@ Tealdr is a rust implementation of tldr
 #+begin_src nix
 {
   home.packages = [ pkgs.zip pkgs.unzip ];
+}
+#+end_src
+*** spectre-cli
+We use spectre-cli as a password manager
+
+#+name: users-emma-spectre-cli
+#+begin_src nix
+(
+let
+  spectre-cli = pkgs.callPackage ./spectre-cli.nix {};
+in
+{
+  home.packages = [ spectre-cli ];
+  home.shellAliases = {
+    spectre = ''SPECTRE_USERNAME="emmabastas" ${spectre-cli}/bin/spectre -q'';
+    spectre_ = ''${spectre-cli}/bin/spectre -q'';
+  };
+}
+)
+#+end_src
+*** customized vim
+The system-installed vim is boring, let's add our own
+
+#+name: users-emma-vim
+#+begin_src nix
+{
+  home.packages = [ (pkgs.callPackage ./vim-cli.nix {}) ];
 }
 #+end_src
 ** Globally installed programming language
