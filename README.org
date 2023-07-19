@@ -8,29 +8,28 @@
 - [[#nix-environment-for-this-config][Nix environment for this config]]
 - [[#root-config][Root config]]
   - [[#utility-functions][Utility functions]]
-- [[#emacs][Emacs]]
-  - [[#moving-around][Moving around]]
-    - [[#remove-wierd-after-org-and-add-hook-org-mode-hook--call][Remove wierd ~after! org~ and ~(add-hook 'org-mode-hook ...)~ call]]
-    - [[#when-moving-multiple-lines-ex-11j-move-by-logical-lines][When moving multiple lines (ex. ~11j~); move by logical lines]]
-  - [[#relative-line-numbering][Relative line numbering]]
-  - [[#insert-emojis-and-unicode][Insert emojis and unicode]]
+- [[#user-emmabastas][user ~emmabastas~]]
+  - [[#emacs][Emacs]]
+    - [[#moving-around][Moving around]]
+    - [[#relative-line-numbering][Relative line numbering]]
+    - [[#insert-emojis-and-unicode][Insert emojis and unicode]]
     - [[#custom-unicodeemoji-insertion][Custom unicode/emoji insertion]]
-  - [[#spell-checking-not-active-wasnt-configured-successfully][Spell checking (Not active, wasn't configured successfully)]]
-  - [[#general-org-mode][General =org-mode=]]
-    - [[#todo-keywords][TODO-Keywords]]
-    - [[#font-faces][Font faces]]
-    - [[#which-programs-to-use-for-opening-org-links][Which programs to use for opening org links]]
-  - [[#zettelkasten-method-with-org-roam-v2][Zettelkasten-method with =org-roam v2=.]]
-    - [[#roam-graph-with-graphviz][roam graph with =graphviz=]]
-    - [[#org-roam-ui][=org-roam-ui=]]
-    - [[#custom-capture-templates][Custom capture templates]]
-  - [[#read-pdfs-and-epubs-with-pdftools-novel-and-anotate-them-with-noter][Read pdf's and epub's with =pdftools=, =nov.el= and anotate them with =noter=]]
-  - [[#terminal-emulator][Terminal emulator]]
-  - [[#python-language-server][Python language server]]
-- [[#globally-installed-programming-language][Globally installed programming language]]
-- [[#flashcards-setup][Flashcards setup]]
-  - [[#org-drill][=org-drill=]]
-  - [[#webwork-flashcard][=webwork-flashcard=]]
+    - [[#spell-checking-not-active-wasnt-configured-successfully][Spell checking (Not active, wasn't configured successfully)]]
+    - [[#general-org-mode][General =org-mode=]]
+    - [[#zettelkasten-method-with-org-roam-v2][Zettelkasten-method with =org-roam v2=.]]
+    - [[#read-pdfs-and-epubs-with-pdftools-novel-and-anotate-them-with-noter][Read pdf's and epub's with =pdftools=, =nov.el= and anotate them with =noter=]]
+    - [[#terminal-emulator][Terminal emulator]]
+    - [[#python-language-server][Python language server]]
+  - [[#misc-programs-specific-to-emma][Misc programs specific to emma]]
+    - [[#gimp][Gimp]]
+    - [[#feh][Feh]]
+    - [[#tldr][Tldr]]
+    - [[#zip-and-unzip][zip and unzip]]
+  - [[#globally-installed-programming-language][Globally installed programming language]]
+  - [[#flashcards-setup][Flashcards setup]]
+    - [[#org-drill][=org-drill=]]
+    - [[#webwork-flashcard][=webwork-flashcard=]]
+  - [[#backups-with-meganz][Backups with mega.nz]]
 - [[#desktop-environment][Desktop environment]]
 - [[#networking][Networking]]
   -  [[#managing-networkmanager-connections-delete-connections-see-passwords][Managing =NetworkManager= connections (delete connections, see passwords)]]
@@ -40,11 +39,6 @@
   - [[#vim][Vim]]
   - [[#teamviewer][Teamviewer]]
   - [[#mathematica][Mathematica]]
-  - [[#gimp][Gimp]]
-  - [[#feh][Feh]]
-  - [[#tldr][Tldr]]
-  - [[#zip-and-unzip][zip and unzip]]
-- [[#backups-with-meganz][Backups with mega.nz]]
 - [[#machine-specific-configuration][Machine specific configuration]]
     - [[#high-res-screen][High-res screen]]
     - [[#screen-brightness][Screen brightness]]
@@ -160,33 +154,7 @@ Credit to https://youtu.be/watch?v=mJbQ--iBc1U for helping me migrate my origina
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
-              users.emma = lib.mkMerge [
-                nix-doom-emacs.hmModule
-                ({ pkgs, ... }: utils.recursiveMerge [
-                  ((import ./emma) { pkgs = pkgs; })
-                  <<users-emma-emacs-1>>
-                  <<users-emma-emacs-2>>
-                  <<users-emma-emacs-zettelkasten>>
-                  <<users-emma-emacs-nov-el>>
-                  <<users-emma-emacs-python>>
-                  <<users-emma-mega-cmd>>
-                  <<users-emma-mullvad>>
-                  <<users-emma-gimp>>
-                  <<users-emma-feh>>
-                  <<users-emma-tldr>>
-                  <<users-emma-zip-unzip>>
-                  <<users-emma-webwork-flashcard>>
-                  <<users-emma-global-pls>>
-                  {
-                    programs.doom-emacs = {
-                      extraConfig = ''
-                        <<users-emma-emacs-extra-config-zettelkasten>>
-                        <<users-emma-emacs-extra-config-nov-el>>
-                      '';
-                    };
-                  }
-                ])
-              ];
+              <<users-emma>>
             };
           }
           ({ config, pkgs, ... }: (utils.recursiveMerge [
@@ -266,7 +234,41 @@ lib: {
 }
 #+end_src
 
-* Emacs
+* user ~emmabastas~
+Here we can configure programs for the main user account
+
+#+name: users-emma
+#+begin_src nix :noweb yes
+users.emma = lib.mkMerge [
+  nix-doom-emacs.hmModule
+  ({ pkgs, ... }: utils.recursiveMerge [
+    ((import ./emma) { pkgs = pkgs; })
+    <<users-emma-emacs-1>>
+    <<users-emma-emacs-2>>
+    <<users-emma-emacs-zettelkasten>>
+    <<users-emma-emacs-nov-el>>
+    <<users-emma-emacs-python>>
+    <<users-emma-mega-cmd>>
+    <<users-emma-mullvad>>
+    <<users-emma-gimp>>
+    <<users-emma-feh>>
+    <<users-emma-tldr>>
+    <<users-emma-zip-unzip>>
+    <<users-emma-webwork-flashcard>>
+    <<users-emma-global-pls>>
+    {
+      programs.doom-emacs = {
+        extraConfig = ''
+          <<users-emma-emacs-extra-config-zettelkasten>>
+          <<users-emma-emacs-extra-config-nov-el>>
+        '';
+      };
+    }
+  ])
+];
+#+end_src
+
+** Emacs
 We're using [[https://github.com/doomemacs/doomemacs][doom-emacs]]:
 
 #+name: inputs-emacs
@@ -322,7 +324,7 @@ Lastly we run the emacs server on login:
 }
 #+end_src
 
-** Moving around
+*** Moving around
 When moving around we want to move by visual lines instead of actual lines. I.e. if we have this
 
 #+begin_quote
@@ -372,17 +374,17 @@ The config for this looks like:
 )
 #+end_src
 
-*** TODO [#C] Remove wierd ~after! org~ and ~(add-hook 'org-mode-hook ...)~ call
+**** TODO [#C] Remove wierd ~after! org~ and ~(add-hook 'org-mode-hook ...)~ call
 Is it necesary? Was it added because the rebinds would get overriden otherwise? If so there should be a more suitable hook than ~org~ for this, it's kinda confusing.
 
-*** TODO [#C] When moving multiple lines (ex. ~11j~); move by logical lines
+**** TODO [#C] When moving multiple lines (ex. ~11j~); move by logical lines
 When displaying relative line numbers they are displayed following logical lines, and when we're moving multipel lines at once the relative line numbers are what we're looking at, therefore moving multie lines should be interpreted as moving by logical lines
-** Relative line numbering
+*** Relative line numbering
 #+begin_src elisp tangle: ./doom-emacs/config.el
 (setq display-line-numbers-type 'relative)
 #+end_src
 
-** Insert emojis and unicode
+*** Insert emojis and unicode
 :PROPERTIES:
 :ID:       88c7c91a-e4d1-4130-8556-68418df4e65b
 :END:
@@ -437,7 +439,7 @@ We use =emojify= (see [[*Insert emojis][Insert emojis]]) to insert emoji, we can
 
 See https://github.com/iqbalansari/emacs-emojify#custom-emojis for further reading.
 
-** Spell checking (Not active, wasn't configured successfully)
+*** Spell checking (Not active, wasn't configured successfully)
 This hasn't been configured successfully, the broken config that might be useful for a future atempt looks like this:
 
 ~config.el~
@@ -476,8 +478,8 @@ This hasn't been configured successfully, the broken config that might be useful
   '';
 }
 #+end_src
-** General =org-mode=
-*** TODO-Keywords
+*** General =org-mode=
+**** TODO-Keywords
 We define the following keywords:
 
 #+begin_src elisp :tangle ./doom-emacs/config.el
@@ -504,7 +506,7 @@ With the following colors:
 
 We can run  ~M-x list-colors-display~ to see a list of available color names.
 
-*** Font faces
+**** Font faces
 
 When making ~*bold*~, ~/italic/~, etc we don't want to show the actual markers:
 
@@ -548,7 +550,7 @@ Now we setup the font faces: (If you're in a org document and want to know the f
                           ))
 #+end_src
 
-*** Which programs to use for opening org links
+**** Which programs to use for opening org links
 
 #+begin_src elisp :tangle ./doom-emacs/config.el
 (after! org
@@ -563,10 +565,10 @@ Now we setup the font faces: (If you're in a org document and want to know the f
 
 For example opening web pages and pdf's with firefox should be configured in a firefox section.
 
-** Zettelkasten-method with =org-roam v2=.
+*** Zettelkasten-method with =org-roam v2=.
 We install this by manually adding the ~+roam2~ flag to the ~org~ module in ~init.el~.
 
-*** roam graph with =graphviz=
+**** roam graph with =graphviz=
 org-roam uses /graphviz/ to generate a graph from all of the notes. We install the program and make sure that emacs can find the binary:
 
 #+name: users-emma-emacs-zettelkasten
@@ -581,7 +583,7 @@ org-roam uses /graphviz/ to generate a graph from all of the notes. We install t
 (setq org-roam-graph-executable "${pkgs.graphviz.out}/bin/dot")
 #+end_src
 
-*** =org-roam-ui=
+**** =org-roam-ui=
 From https://github.com/org-roam/org-roam-ui#doom
 #+begin_quote
 Org-roam-ui tries to keep up with the latest features of org-roam, which conflicts with Doom Emacs's desire for stability. To make sure nothing breaks, use the latest version of org-roam by unpinning it.
@@ -609,10 +611,10 @@ Org-roam-ui tries to keep up with the latest features of org-roam, which conflic
           org-roam-ui-open-on-start t))
 #+end_src
 
-*** Custom capture templates
+**** Custom capture templates
 Capture templates can be used when creating new nodes with org-roam. I've used [[https://systemcrafters.net/build-a-second-brain-in-emacs/capturing-notes-efficiently/][this blogpost]] to guide me through the process.
 
-**** Default template
+***** Default template
 #+begin_src elisp :tangle ./doom-emacs/config.el
 (after! org-roam
   (setq my-org-roam-capture-tempalte-default
@@ -622,7 +624,7 @@ Capture templates can be used when creating new nodes with org-roam. I've used [
         :unnarrowed t)))
 #+end_src
 
-**** Book note template
+***** Book note template
 #+begin_src elisp :tangle ./doom-emacs/config.el
 (after! org-roam
   (setq my-org-roam-capture-template-book-note
@@ -632,7 +634,7 @@ Capture templates can be used when creating new nodes with org-roam. I've used [
         :unnarrowed t)))
 #+end_src
 
-**** Setting the =org-roam-capture-templates= variable
+***** Setting the =org-roam-capture-templates= variable
 #+begin_src elisp :tangle ./doom-emacs/config.el
 (after! org-roam
   (setq org-roam-capture-templates
@@ -640,7 +642,7 @@ Capture templates can be used when creating new nodes with org-roam. I've used [
               my-org-roam-capture-template-book-note)))
 #+end_src
 
-** Read pdf's and epub's with =pdftools=, =nov.el= and anotate them with =noter=
+*** Read pdf's and epub's with =pdftools=, =nov.el= and anotate them with =noter=
 =noter= allows us to annotate our documents and =nov.el= displays epubs in emacs, these two go very well together!
 
 We added ~+noter~ flag to the ~org~ module in ~doom-emacs/init.el~
@@ -675,7 +677,7 @@ Now we make sure to activate ~nov-mode~ on reading ~.epub~
 (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
 #+end_src
 
-** Terminal emulator
+*** Terminal emulator
 We're using ~shell~ (see ~init.el~) for our terminal needs.
 
 We bind ~C-c t~ to launching a new terminal with ~term_~.
@@ -700,7 +702,7 @@ The ~term_~ function is based off of ~term~ but with two changes:
 (define-key (current-global-map) (kbd "C-c t") #'term_)
 #+end_src
 
-** Python language server
+*** Python language server
 We've added ~(python +lsp +pyright)~ to ~./doom-emacs/init.el~.
 
 We also install pyright to the user environment
@@ -712,7 +714,41 @@ We also install pyright to the user environment
 }
 #+end_src
 
-* Globally installed programming language
+**** TODO Can pyright be installed so that only emacs can see it? Only emacs uses it
+
+** Misc programs specific to emma
+*** Gimp
+#+name: users-emma-gimp
+#+begin_src nix
+{
+  home.packages = [ pkgs.gimp ];
+}
+#+end_src
+*** Feh
+#+name: users-emma-feh
+#+begin_src nix
+{
+  home.packages = [ pkgs.feh ];
+}
+#+end_src
+
+*** Tldr
+Tealdr is a rust implementation of tldr
+#+name: users-emma-tldr
+#+begin_src nix
+{
+  home.packages = [ pkgs.tealdeer ];
+}
+#+end_src
+
+*** zip and unzip
+#+name: users-emma-zip-unzip
+#+begin_src nix
+{
+  home.packages = [ pkgs.zip pkgs.unzip ];
+}
+#+end_src
+** Globally installed programming language
 Some languages we find ourselves using quite a lot for simple scripting and we want to install them globally to save ourselves from a bunch of ~shell.nix~'s all over the place.
 
 #+name: users-emma-global-pls
@@ -727,8 +763,8 @@ Some languages we find ourselves using quite a lot for simple scripting and we w
 
 In addition to this we add the ~python~ and ~haskell~ module to ~init.el~
 
-* Flashcards setup
-** =org-drill=
+** Flashcards setup
+*** =org-drill=
 We install org-drill via ~packages.el~:
 
 #+begin_src elisp :tangle ./doom-emacs/packages.el
@@ -753,7 +789,7 @@ I don't want the card headings to show as they ca reveal information.
 (setq org-drill-hide-item-headings-p t)
 #+end_src
 
-** =webwork-flashcard=
+*** =webwork-flashcard=
 I've made a custom webserver for integrating webwork problems with my flashcard setup. Read more about it here: https://github.com/emmabastas/webwork-flashcard
 
 #+name: users-emma-webwork-flashcard
@@ -762,6 +798,37 @@ I've made a custom webserver for integrating webwork problems with my flashcard 
   home.packages = [ (pkgs.callPackage ./webwork-flashcard {}) ];
 }
 #+end_src
+** Backups with mega.nz
+/NOTE: All of the setup here is statefull, not done automatically by nix./
+
+We use[[https://mega.nz/cmd][ mega-cmd]] to backup some files in the home directory.
+
+install mega-cmd:
+
+#+name: users-emma-mega-cmd
+#+begin_src nix
+{
+  home.packages = [ pkgs.megacmd ];
+}
+#+end_src
+
+Based off [[https://github.com/meganz/MEGAcmd/blob/master/contrib/docs/BACKUPS.md][this guide]]
+
+First we need to login:
+#+begin_src bash
+mega-login <email> <password>
+#+end_src
+
+Create the backup directory on the cloud if it doesn't exists.
+Then we sync ~~/org~ every day at 10:00 and keep 10 backups.
+
+#+begin_src
+# Create backup directory if it doesn't exists
+mega-mkdir -p /backups/samsung_940x/daily/
+
+mega-backup /home/emma/org/ /backups/samsung_940x/daily/ --period="0 0 10 * * *" --num-backups=10
+#+end_src
+
 * Desktop environment
 
 Use =i3= as the window manager:
@@ -851,7 +918,6 @@ Connections are stored in [[/etc/NetworkManager/system-connections/]] (requires 
 
 * Other packages
 ** Vim
-
 #+name: system-wide-vim
 #+begin_src nix
 {
@@ -889,68 +955,6 @@ After that we can install the nix package:
   nixpkgs.config.allowUnfree = true;
   environment.systemPackages = [ pkgs.mathematica ];
 }
-#+end_src
-
-** Gimp
-#+name: users-emma-gimp
-#+begin_src nix
-{
-  home.packages = [ pkgs.gimp ];
-}
-#+end_src
-** Feh
-#+name: users-emma-feh
-#+begin_src nix
-{
-  home.packages = [ pkgs.feh ];
-}
-#+end_src
-
-** Tldr
-Tealdr is a rust implementation of tldr
-#+name: users-emma-tldr
-#+begin_src nix
-{
-  home.packages = [ pkgs.tealdeer ];
-}
-#+end_src
-
-** zip and unzip
-#+name: users-emma-zip-unzip
-#+begin_src nix
-{
-  home.packages = [ pkgs.zip pkgs.unzip ];
-}
-#+end_src
-* Backups with mega.nz
-/NOTE: All of the setup here is statefull, not done automatically by nix./
-
-We use[[https://mega.nz/cmd][ mega-cmd]] to backup some files in the home directory.
-
-install mega-cmd:
-
-#+name: users-emma-mega-cmd
-#+begin_src nix
-{
-  home.packages = [ pkgs.megacmd ];
-}
-#+end_src
-
-Based off [[https://github.com/meganz/MEGAcmd/blob/master/contrib/docs/BACKUPS.md][this guide]]
-
-First we need to login:
-#+begin_src bash
-mega-login <email> <password>
-#+end_src
-
-Create the backup directory on the cloud if it doesn't exists.
-Then we sync ~~/org~ every day at 10:00 and keep 10 backups.
-
-#+begin_src
-# Create backup directory if it doesn't exists
-mega-mkdir -p /backups/samsung_940x/daily/
-
-mega-backup /home/emma/org/ /backups/samsung_940x/daily/ --period="0 0 10 * * *" --num-backups=10
 #+end_src
 
 * Machine specific configuration
