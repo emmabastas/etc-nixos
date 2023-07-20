@@ -45,6 +45,7 @@
 - [[#user-foo][user ~foo~]]
   - [[#spectre][Spectre]]
   - [[#git-1][Git]]
+  - [[#mullvad-browser][Mullvad browser]]
 - [[#desktop-environment][Desktop environment]]
 - [[#networking][Networking]]
   -  [[#managing-networkmanager-connections-delete-connections-see-passwords][Managing =NetworkManager= connections (delete connections, see passwords)]]
@@ -1059,7 +1060,6 @@ lib.mkMerge [
     <<users-emma-tldr>>
     <<users-emma-zip-unzip>>
     <<users-emma-global-pls>>
-    <<users-emma-firefox>>
     <<users-emma-vim>>
     <<users-emma-direnv>>
     <<users-emma-st>>
@@ -1117,6 +1117,16 @@ For our ~foo~ user we want to configure our bash shell in a non-declarative fash
   };
 }
 #+end_src
+
+** Mullvad browser
+#+name: users-foo-mullvad-browser
+#+begin_src nix
+{
+  home.packages = [ pkgs.mullvad-browser ];
+  home.file."bin/mullvad-browser" = applicationScript "${pkgs.mullvad-browser}/bin/mullvad-browser $@";
+}
+#+end_src
+
 * Desktop environment
 
 Use =i3= as the window manager:

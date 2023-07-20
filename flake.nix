@@ -227,6 +227,10 @@
                     };
                   }
                   {
+                    home.packages = [ pkgs.mullvad-browser ];
+                    home.file."bin/mullvad-browser" = applicationScript "${pkgs.mullvad-browser}/bin/mullvad-browser $@";
+                  }
+                  {
                     programs.doom-emacs = {
                       doomPrivateDir = pkgs.linkFarm "doom-config" [
                         { name = "config.el"; path = ./doom-emacs/config.el; }
@@ -274,15 +278,6 @@
                       pkgs.haskell-language-server
                     ];
                   }
-                  (
-                  let
-                    firefox = pkgs.firefox;
-                  in
-                  {
-                    home.packages = [ firefox ];
-                    home.file."bin/firefox" = applicationScript "${firefox}/bin/firefox $@";
-                  }
-                  )
                   {
                     home.packages = [ (pkgs.callPackage ./vim-cli.nix {}) ];
                   }
