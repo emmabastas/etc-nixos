@@ -922,18 +922,13 @@ We use spectre-cli as a password manager
 
 #+name: users-emma-spectre-cli
 #+begin_src nix
-(
-let
-  spectre-cli = pkgs.callPackage ./spectre-cli.nix {};
-in
 {
-  home.packages = [ spectre-cli ];
+  home.packages = [ pkgs.spectre-cli ];
   home.shellAliases = {
-    spectre = ''SPECTRE_USERNAME="emmabastas" ${spectre-cli}/bin/spectre -q'';
-    spectre_ = ''${spectre-cli}/bin/spectre -q'';
+    spectre = ''SPECTRE_USERNAME="emmabastas" ${pkgs.spectre-cli}/bin/spectre -q'';
+    spectre_ = ''${pkgs.spectre-cli}/bin/spectre -q'';
   };
 }
-)
 #+end_src
 *** customized vim
 The system-installed vim is boring, let's add our own
@@ -1055,6 +1050,7 @@ lib.mkMerge [
     }
     <<users-foo-spectre-cli>>
     <<users-foo-git>>
+    <<users-foo-mullvad-browser>>
     <<users-emma-emacs-1>>
     <<users-emma-emacs-2>>
     <<users-emma-emacs-3>>
@@ -1082,20 +1078,29 @@ lib.mkMerge [
 ];
 #+end_src
 
+** bash
+For our ~foo~ user we want to configure our bash shell in a non-declarative fashion for ease of use
+
+#+name: users-foo-bash
+#+begin_src nix
+{
+  programs.bash = {
+    enable = true;
+    bashrcExtra = ''
+      export PATH=$HOME/bin:$PATH
+      source $HOME/bashrc
+      <<users-emma-direnv-bashrc-extra>>
+    '';
+  };
+}
+#+end_src
+
 ** Spectre
 #+name: users-foo-spectre-cli
 #+begin_src nix
-(
-let
-  spectre-cli = pkgs.callPackage ./spectre-cli.nix {};
-in
 {
-  home.packages = [ spectre-cli ];
-  home.shellAliases = {
-    spectre = ''${spectre-cli}/bin/spectre -q'';
-  };
+  home.packages = [ pkgs.spectre-cli ];
 }
-)
 #+end_src
 
 ** Git

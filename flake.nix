@@ -120,18 +120,13 @@
                       pkgs.haskell-language-server
                     ];
                   }
-                  (
-                  let
-                    spectre-cli = pkgs.callPackage ./spectre-cli.nix {};
-                  in
                   {
-                    home.packages = [ spectre-cli ];
+                    home.packages = [ pkgs.spectre-cli ];
                     home.shellAliases = {
-                      spectre = ''SPECTRE_USERNAME="emmabastas" ${spectre-cli}/bin/spectre -q'';
-                      spectre_ = ''${spectre-cli}/bin/spectre -q'';
+                      spectre = ''SPECTRE_USERNAME="emmabastas" ${pkgs.spectre-cli}/bin/spectre -q'';
+                      spectre_ = ''${pkgs.spectre-cli}/bin/spectre -q'';
                     };
                   }
-                  )
                   (
                   let
                     firefox = pkgs.firefox;
@@ -215,17 +210,12 @@
                   {
                     home.stateVersion = "21.11";
                   }
-                  (
-                  let
-                    spectre-cli = pkgs.callPackage ./spectre-cli.nix {};
-                  in
                   {
-                    home.packages = [ spectre-cli ];
-                    home.shellAliases = {
-                      spectre = ''${spectre-cli}/bin/spectre -q'';
                     };
                   }
-                  )
+                  {
+                    home.packages = [ pkgs.spectre-cli ];
+                  }
                   {
                     programs.git = {
                       enable = true;
