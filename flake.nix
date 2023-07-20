@@ -412,8 +412,8 @@
               environment.systemPackages = [ pkgs.brightnessctl ];
             }
             {
-              nixpkgs.config.allowUnfree = true;
-              environment.systemPackages = [ pkgs.mathematica ];
+              #nixpkgs.config.allowUnfree = true;
+              #environment.systemPackages = [ pkgs.mathematica ];
             }
             {
               #nixpkgs.config.allowUnfree = true;

@@ -1216,6 +1216,8 @@ We sometimes want to use Teamviewer to help friends and family with IT. Teamview
 We could proably find a better way to disable teamviewer by default, but this is 80/20.
 
 ** Mathematica
+NO LONGER USING THIS PACKAGE
+
 Mathematica is proprietary software, and the nix package requires ~Mathematica_13.0.1_BNDL_LINUX.sh~ to already be a part of the store.
 The file can be downoaded by going to [[https://account.wolfram.com/products]] ~> User Portal~ and doing a =Drect File Download=.
 
@@ -1228,8 +1230,8 @@ After that we can install the nix package:
 #+name: system-wide-mathematica
 #+begin_src nix
 {
-  nixpkgs.config.allowUnfree = true;
-  environment.systemPackages = [ pkgs.mathematica ];
+  #nixpkgs.config.allowUnfree = true;
+  #environment.systemPackages = [ pkgs.mathematica ];
 }
 #+end_src
 
