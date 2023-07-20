@@ -43,6 +43,7 @@
     - [[#webwork-flashcard][=webwork-flashcard=]]
   - [[#backups-with-meganz][Backups with mega.nz]]
 - [[#user-foo][user ~foo~]]
+  - [[#bash][bash]]
   - [[#spectre][Spectre]]
   - [[#git-1][Git]]
   - [[#mullvad-browser][Mullvad browser]]
@@ -1049,6 +1050,7 @@ lib.mkMerge [
     {
       home.stateVersion = <<state-version>>;
     }
+    <<users-foo-bash>>
     <<users-foo-spectre-cli>>
     <<users-foo-git>>
     <<users-foo-mullvad-browser>>
@@ -1065,7 +1067,6 @@ lib.mkMerge [
     <<users-emma-st>>
     <<users-emma-nerdfonts>>
     <<users-emma-ssh>>
-    <<users-emma-bash>>
     <<users-emma-i3>>
     <<users-emma-nix-flakes>>
     {
@@ -1082,7 +1083,7 @@ lib.mkMerge [
 For our ~foo~ user we want to configure our bash shell in a non-declarative fashion for ease of use
 
 #+name: users-foo-bash
-#+begin_src nix
+#+begin_src nix :noweb yes
 {
   programs.bash = {
     enable = true;

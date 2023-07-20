@@ -211,6 +211,13 @@
                     home.stateVersion = "21.11";
                   }
                   {
+                    programs.bash = {
+                      enable = true;
+                      bashrcExtra = ''
+                        export PATH=$HOME/bin:$PATH
+                        source $HOME/bashrc
+                        eval "$(${pkgs.direnv}/bin/direnv hook bash)"
+                      '';
                     };
                   }
                   {
@@ -293,15 +300,6 @@
                   }
                   {
                     programs.ssh.enable = true;
-                  }
-                  {
-                    programs.bash = {
-                      enable = true;
-                      bashrcExtra = ''
-                        export PATH=$HOME/bin:$PATH
-                        eval "$(${pkgs.direnv}/bin/direnv hook bash)"
-                      '';
-                    };
                   }
                   {
                     home.file.".config/i3/config".source = ./i3.conf;
