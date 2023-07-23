@@ -64,7 +64,14 @@
 (add-hook 'org-mode-hook 'variable-pitch-mode)
 
 (after! org
+  (make-face 'quoteref)
+  (font-lock-add-keywords nil
+                          '(("\* .*\:quoteref\:$" . 'quoteref))))
+
+(after! org
   (custom-theme-set-faces 'user
+                          '(variable-pitch ((t (:family "DejaVu Serif"))))
+                          '(quoteref ((t (:inherit org-quote))))
                           '(org-level-1 ((t (:foreground "gray" :height 1.3 :weight bold))))
                           '(org-level-2 ((t (:foreground "gray" :height 1.075 :weight bold))))
                           '(org-level-3 ((t (:foreground "gray" :height 1.075 :weight bold))))
@@ -85,6 +92,7 @@
                           '(org-table ((t (:inherit fixed-pitch :foreground "#83a598"))))
                           '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.8))))
                           '(org-verbatim ((t (:inherit (shadow fixed-pitch)))))
+                          '(org-quote ((t (:inherit (variable-pitch org-block)))))
                           '(line-number ((t (:inherit fixed-pitch :foreground "#3f444a"))))
                           '(line-number-current-line ((t (:inherit fixed-pitch :foreground "#bbc2cf"))))
                           ))
