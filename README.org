@@ -5,6 +5,7 @@
   - [[#tangle][Tangle.]]
   - [[#make-sure-relevant-files-are-checking-into-version-control][Make sure relevant files are checking into version control]]
   - [[#apply-the-config-with-dry-activate--test--switch][Apply the config with ~dry-activate~ / ~test~ / ~switch~.]]
+  - [[#remove-old-generations][Remove old generations]]
 - [[#nix-environment-for-this-config][Nix environment for this config]]
 - [[#root-config][Root config]]
   - [[#utility-functions][Utility functions]]
@@ -97,6 +98,10 @@ When running a nix flake unstaged files are ignored (see[[https://github.com/Nix
 
 ~nixos-rebuild <dry-activate | test | switch> --flake .~
 
+** Remove old generations
+List current genrations with ~sudo nix-env -p /nix/var/nix/profiles/system --list-generations~
+Delete generations older than 30 days, but keep at least 5 generations ~sudo nix-env --delete-generations 30d +5~
+Finaly collect the garbage ~sudo nix-collect-garbage~
 * Nix environment for this config
 To tangle this config and interactively run some of the non shell and elsip code-blocks we want to setup a nix environment.
 
